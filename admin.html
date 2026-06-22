@@ -40,7 +40,15 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
+    <!-- Simple password protection -->
+    <script>
+        const ADMIN_PASSWORD = "your_secure_password_here"; // CHANGE THIS!
+        if (prompt("Enter admin password:") !== ADMIN_PASSWORD) {
+            document.body.innerHTML = "<h1 style='text-align:center;margin-top:20%;'>🔒 Access Denied</h1>";
+            throw new Error("Access denied");
+        }
+    </script>
+
     <div class="sidebar-admin">
         <div class="text-2xl font-bold mb-8"><span class="text-blue-500">Getaye</span>.dev <span class="text-xs text-gray-400 font-normal">admin</span></div>
         <nav>
@@ -57,7 +65,6 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="main-admin">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold" id="pageTitle">Experiences</h1>
@@ -91,48 +98,20 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://vedehlwosfutknqhguiv.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVydnZia3B3Y29vb3pveWt5cHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYzOTM2MDYsImV4cCI6MjA4MTk2OTYwNn0.zINGtyLi6zV-lf33QVwhhNJahnA0_nwLWkw7_d7Y8fE';
+        const SUPABASE_URL = "https://vedehlwosfutknqhguiv.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlZGVobHdvc2Z1dGtucWhndWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMjQxOTUsImV4cCI6MjA5NzcwMDE5NX0.PU4cyfwNj41flxXXcLL37YgLHIjKhzkkRg4KWmHZ0H0";
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentTable = 'experiences';
         let editingId = null;
         const tableConfigs = {
-            experiences: {
-                fields: ['title', 'company', 'period', 'location', 'description', 'company_same', 'display_order'],
-                labels: { title: 'Job Title', company: 'Company', period: 'Period (e.g. Apr 2025 - Present)', location: 'Location', description: 'Description', company_same: 'Same Company (checkbox)', display_order: 'Display Order' },
-                types: { company_same: 'checkbox', display_order: 'number' }
-            },
-            certifications: {
-                fields: ['name', 'issuer', 'year', 'credential_id', 'display_order'],
-                labels: { name: 'Certification Name', issuer: 'Issuer', year: 'Year', credential_id: 'Credential ID', display_order: 'Display Order' },
-                types: { display_order: 'number' }
-            },
-            education: {
-                fields: ['degree', 'school', 'year', 'focus', 'gpa', 'display_order'],
-                labels: { degree: 'Degree', school: 'School', year: 'Year', focus: 'Focus Area', gpa: 'GPA', display_order: 'Display Order' },
-                types: { display_order: 'number' }
-            },
-            projects: {
-                fields: ['name', 'description', 'tech', 'year', 'link', 'display_order'],
-                labels: { name: 'Project Name', description: 'Description', tech: 'Technologies (comma separated)', year: 'Year', link: 'Project Link', display_order: 'Display Order' },
-                types: { display_order: 'number' }
-            },
-            news: {
-                fields: ['title', 'content', 'date', 'pinned'],
-                labels: { title: 'Title', content: 'Content', date: 'Date', pinned: 'Pinned (checkbox)' },
-                types: { pinned: 'checkbox', date: 'date' }
-            },
-            services: {
-                fields: ['name', 'description', 'icon', 'display_order'],
-                labels: { name: 'Service Name', description: 'Description', icon: 'Font Awesome Icon (e.g. fas fa-code)', display_order: 'Display Order' },
-                types: { display_order: 'number' }
-            },
-            clients: {
-                fields: ['name', 'logo_url', 'description', 'display_order'],
-                labels: { name: 'Client Name', logo_url: 'Logo URL', description: 'Description', display_order: 'Display Order' },
-                types: { display_order: 'number' }
-            }
+            experiences: { fields: ['title', 'company', 'period', 'location', 'description', 'company_same', 'display_order'], labels: { title: 'Job Title', company: 'Company', period: 'Period (e.g. Apr 2025 - Present)', location: 'Location', description: 'Description', company_same: 'Same Company (checkbox)', display_order: 'Display Order' }, types: { company_same: 'checkbox', display_order: 'number' } },
+            certifications: { fields: ['name', 'issuer', 'year', 'credential_id', 'display_order'], labels: { name: 'Certification Name', issuer: 'Issuer', year: 'Year', credential_id: 'Credential ID', display_order: 'Display Order' }, types: { display_order: 'number' } },
+            education: { fields: ['degree', 'school', 'year', 'focus', 'gpa', 'display_order'], labels: { degree: 'Degree', school: 'School', year: 'Year', focus: 'Focus Area', gpa: 'GPA', display_order: 'Display Order' }, types: { display_order: 'number' } },
+            projects: { fields: ['name', 'description', 'tech', 'year', 'link', 'display_order'], labels: { name: 'Project Name', description: 'Description', tech: 'Technologies (comma separated)', year: 'Year', link: 'Project Link', display_order: 'Display Order' }, types: { display_order: 'number' } },
+            news: { fields: ['title', 'content', 'date', 'pinned'], labels: { title: 'Title', content: 'Content', date: 'Date', pinned: 'Pinned (checkbox)' }, types: { pinned: 'checkbox', date: 'date' } },
+            services: { fields: ['name', 'description', 'icon', 'display_order'], labels: { name: 'Service Name', description: 'Description', icon: 'Font Awesome Icon (e.g. fas fa-code)', display_order: 'Display Order' }, types: { display_order: 'number' } },
+            clients: { fields: ['name', 'logo_url', 'description', 'display_order'], labels: { name: 'Client Name', logo_url: 'Logo URL', description: 'Description', display_order: 'Display Order' }, types: { display_order: 'number' } }
         };
 
         async function loadData(table) {
@@ -147,7 +126,6 @@
             const head = document.getElementById('tableHead');
             const body = document.getElementById('tableBody');
             document.getElementById('pageTitle').textContent = table.charAt(0).toUpperCase() + table.slice(1);
-
             head.innerHTML = `<tr>${config.fields.map(f => `<th>${config.labels[f] || f}</th>`).join('')}<th>Actions</th></tr>`;
             body.innerHTML = data.map(row => `
                 <tr>
@@ -240,7 +218,6 @@
             document.getElementById('modalForm').reset();
         }
 
-        // Sidebar navigation
         document.querySelectorAll('.sidebar-admin a[data-table]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -250,7 +227,6 @@
             });
         });
 
-        // Load initial
         loadData('experiences');
     </script>
 </body>
