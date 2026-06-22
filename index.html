@@ -12,16 +12,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (for development only; replace with PostCSS in production) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Supabase JS -->
+    <!-- Supabase JS (only once) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <!-- EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     
     <style>
+        /* ===== Your existing styles (unchanged) ===== */
         * { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         body { transition: background-color 0.3s ease; overflow-x: hidden; }
         .sidebar {
@@ -110,23 +111,25 @@
         // ==================== SUPABASE CONFIG ====================
         const SUPABASE_URL = "https://vedehlwosfutknqhguiv.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlZGVobHdvc2Z1dGtucWhndWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMjQxOTUsImV4cCI6MjA5NzcwMDE5NX0.PU4cyfwNj41flxXXcLL37YgLHIjKhzkkRg4KWmHZ0H0";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
+
+        // Initialize Supabase client (no duplicate)
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         // ==================== EMAILJS ====================
         const EMAILJS_PUBLIC_KEY = "kIJSIlPXMV_TU9Dv6";
         const EMAILJS_SERVICE_ID = "service_cyqyljp";
         const EMAILJS_TEMPLATE_ID = "template_sbfixck";
         emailjs.init(EMAILJS_PUBLIC_KEY);
-        
+
         // ==================== STATE ====================
         let currentSection = 'home';
         let allData = { experiences: [], certifications: [], education: [], projects: [], news: [], services: [], clients: [] };
-        
+
         const container = document.getElementById('content-container');
         const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
         const hamburger = document.getElementById('hamburger');
         const sidebar = document.getElementById('sidebar');
-        
+
         sidebarLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -136,24 +139,24 @@
             });
         });
         hamburger.addEventListener('click', () => { sidebar.classList.toggle('open'); });
-        
+
         function navigateTo(section) {
             currentSection = section;
             sidebarLinks.forEach(l => l.classList.remove('active'));
             document.querySelector(`.sidebar-nav a[data-section="${section}"]`)?.classList.add('active');
             renderSection(section);
         }
-        
+
         async function fetchAllData() {
             try {
                 const [experiences, certifications, education, projects, news, services, clients] = await Promise.all([
-                    supabase.from('experiences').select('*').order('display_order', { ascending: true }),
-                    supabase.from('certifications').select('*').order('display_order', { ascending: true }),
-                    supabase.from('education').select('*').order('display_order', { ascending: true }),
-                    supabase.from('projects').select('*').order('display_order', { ascending: true }),
-                    supabase.from('news').select('*').order('date', { ascending: false }),
-                    supabase.from('services').select('*').order('display_order', { ascending: true }),
-                    supabase.from('clients').select('*').order('display_order', { ascending: true })
+                    supabaseClient.from('experiences').select('*').order('display_order', { ascending: true }),
+                    supabaseClient.from('certifications').select('*').order('display_order', { ascending: true }),
+                    supabaseClient.from('education').select('*').order('display_order', { ascending: true }),
+                    supabaseClient.from('projects').select('*').order('display_order', { ascending: true }),
+                    supabaseClient.from('news').select('*').order('date', { ascending: false }),
+                    supabaseClient.from('services').select('*').order('display_order', { ascending: true }),
+                    supabaseClient.from('clients').select('*').order('display_order', { ascending: true })
                 ]);
                 allData.experiences = experiences.data || [];
                 allData.certifications = certifications.data || [];
@@ -168,7 +171,7 @@
                 container.innerHTML = `<div class="text-center py-12 text-red-500">⚠️ Failed to load data. Please try again.</div>`;
             }
         }
-        
+
         function renderSection(section) {
             switch(section) {
                 case 'home': renderHome(); break;
@@ -184,7 +187,7 @@
                 default: renderHome();
             }
         }
-        
+
         function renderHome() {
             const exp = allData.experiences;
             container.innerHTML = `
@@ -225,7 +228,7 @@
                 </div>
             `;
         }
-        
+
         function renderAbout() {
             container.innerHTML = `
                 <div class="max-w-3xl mx-auto space-y-6">
@@ -243,7 +246,7 @@
                 </div>
             `;
         }
-        
+
         function renderNews() {
             if (allData.news.length === 0) { container.innerHTML = `<div class="text-center py-12 text-gray-500">No news yet. Check back soon!</div>`; return; }
             container.innerHTML = `
@@ -259,7 +262,7 @@
                 </div>
             `;
         }
-        
+
         function renderServices() {
             if (allData.services.length === 0) { container.innerHTML = `<div class="text-center py-12 text-gray-500">No services listed yet.</div>`; return; }
             container.innerHTML = `
@@ -277,7 +280,7 @@
                 </div>
             `;
         }
-        
+
         function renderClients() {
             if (allData.clients.length === 0) { container.innerHTML = `<div class="text-center py-12 text-gray-500">No clients yet.</div>`; return; }
             container.innerHTML = `
@@ -295,7 +298,7 @@
                 </div>
             `;
         }
-        
+
         function renderExperience() {
             if (allData.experiences.length === 0) { container.innerHTML = `<div class="text-center py-12 text-gray-500">No experience yet.</div>`; return; }
             const grouped = allData.experiences.reduce((acc, exp) => { if (!acc[exp.company]) acc[exp.company] = []; acc[exp.company].push(exp); return acc; }, {});
@@ -322,7 +325,7 @@
                 </div>
             `;
         }
-        
+
         function renderEducation() {
             if (allData.education.length === 0) { container.innerHTML = `<div class="text-center py-12 text-gray-500">No education yet.</div>`; return; }
             container.innerHTML = `
@@ -340,7 +343,7 @@
                 </div>
             `;
         }
-        
+
         function renderCertifications() {
             if (allData.certifications.length === 0) { container.innerHTML = `<div class="text-center py-12 text-gray-500">No certifications yet.</div>`; return; }
             container.innerHTML = `
@@ -359,7 +362,7 @@
                 </div>
             `;
         }
-        
+
         function renderProjects() {
             if (allData.projects.length === 0) { container.innerHTML = `<div class="text-center py-12 text-gray-500">No projects yet.</div>`; return; }
             container.innerHTML = `
@@ -381,7 +384,7 @@
                 </div>
             `;
         }
-        
+
         function renderContact() {
             container.innerHTML = `
                 <div class="max-w-3xl mx-auto">
@@ -433,7 +436,7 @@
                 } finally { btn.disabled = false; btn.innerHTML = 'Send Message'; }
             });
         }
-        
+
         function initTheme() {
             const saved = localStorage.getItem('theme') || 'light';
             document.body.className = saved;
@@ -447,11 +450,11 @@
             const icon = document.getElementById('theme-icon');
             if (icon) { icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon'; icon.style.color = isDark ? '#eab308' : '#9ca3af'; }
         });
-        
+
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !hamburger.contains(e.target)) { sidebar.classList.remove('open'); }
         });
-        
+
         initTheme();
         fetchAllData();
     </script>
