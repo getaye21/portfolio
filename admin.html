@@ -42,7 +42,7 @@
 <body>
     <!-- Simple password protection -->
     <script>
-        const ADMIN_PASSWORD = "getaye"; // CHANGE THIS!
+        const ADMIN_PASSWORD = "your_secure_password_here"; // CHANGE THIS!
         if (prompt("Enter admin password:") !== ADMIN_PASSWORD) {
             document.body.innerHTML = "<h1 style='text-align:center;margin-top:20%;'>🔒 Access Denied</h1>";
             throw new Error("Access denied");
@@ -50,7 +50,7 @@
     </script>
 
     <div class="sidebar-admin">
-        <div class="text-2xl font-bold mb-8"><span class="text-blue-500">Getaye Fiseha Tadesse</span> <span class="text-xs text-gray-400 font-normal">admin</span></div>
+        <div class="text-2xl font-bold mb-8"><span class="text-blue-500">Getaye Fiseha Tadesse</span></div>
         <nav>
             <a href="#" class="active" data-table="experiences"><i class="fas fa-briefcase mr-3"></i> Experiences</a>
             <a href="#" data-table="certifications"><i class="fas fa-certificate mr-3"></i> Certifications</a>
@@ -100,7 +100,7 @@
     <script>
         const SUPABASE_URL = "https://vedehlwosfutknqhguiv.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlZGVobHdvc2Z1dGtucWhndWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMjQxOTUsImV4cCI6MjA5NzcwMDE5NX0.PU4cyfwNj41flxXXcLL37YgLHIjKhzkkRg4KWmHZ0H0";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentTable = 'experiences';
         let editingId = null;
@@ -116,7 +116,7 @@
 
         async function loadData(table) {
             currentTable = table;
-            const { data, error } = await supabase.from(table).select('*').order('display_order', { ascending: true });
+            const { data, error } = await supabaseClient.from(table).select('*').order('display_order', { ascending: true });
             if (error) { console.error(error); return; }
             renderTable(table, data);
         }
@@ -153,7 +153,7 @@
 
         async function editItem(id) {
             editingId = id;
-            const { data, error } = await supabase.from(currentTable).select('*').eq('id', id).single();
+            const { data, error } = await supabaseClient.from(currentTable).select('*').eq('id', id).single();
             if (error) { console.error(error); return; }
             document.getElementById('modalTitle').textContent = `Edit ${currentTable.slice(0, -1)}`;
             buildForm(data);
@@ -196,9 +196,9 @@
 
             try {
                 if (editingId) {
-                    await supabase.from(currentTable).update(data).eq('id', editingId);
+                    await supabaseClient.from(currentTable).update(data).eq('id', editingId);
                 } else {
-                    await supabase.from(currentTable).insert(data);
+                    await supabaseClient.from(currentTable).insert(data);
                 }
                 closeModal();
                 loadData(currentTable);
@@ -209,7 +209,7 @@
 
         async function deleteItem(id) {
             if (!confirm('Delete this item?')) return;
-            await supabase.from(currentTable).delete().eq('id', id);
+            await supabaseClient.from(currentTable).delete().eq('id', id);
             loadData(currentTable);
         }
 
