@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Getaye Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #f8fafc; }
+        .admin-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .admin-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+        .btn { padding: 0.5rem 1.25rem; border-radius: 10px; font-weight: 500; transition: all 0.2s; border: none; cursor: pointer; }
+        .btn-primary { background: #3B82F6; color: white; }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-outline { background: transparent; border: 2px solid #e2e8f0; }
+        .btn-outline:hover { background: #f1f5f9; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 0.75rem 1rem; background: #f1f5f9; font-weight: 600; font-size: 0.85rem; color: #475569; }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+        tr:hover td { background: #f8fafc; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.open { display: flex; }
+        .modal-content { background: white; border-radius: 20px; padding: 2rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 1rem; font-size: 0.95rem; }
+        .modal-content label { font-weight: 500; display: block; margin-bottom: 0.25rem; font-size: 0.9rem; color: #475569; }
+        .sidebar-admin { width: 240px; background: white; border-right: 1px solid #e2e8f0; min-height: 100vh; padding: 1.5rem; position: fixed; }
+        .sidebar-admin a { display: block; padding: 0.75rem 1rem; border-radius: 10px; color: #475569; text-decoration: none; transition: all 0.2s; }
+        .sidebar-admin a:hover, .sidebar-admin a.active { background: #eff6ff; color: #3B82F6; }
+        .main-admin { margin-left: 240px; padding: 2rem; }
+        @media (max-width: 768px) { .sidebar-admin { display: none; } .main-admin { margin-left: 0; } }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar-admin">
+        <div class="text-2xl font-bold mb-8"><span class="text-blue-500">Getaye</span>.dev <span class="text-xs text-gray-400 font-normal">admin</span></div>
+        <nav>
+            <a href="#" class="active" data-table="experiences"><i class="fas fa-briefcase mr-3"></i> Experiences</a>
+            <a href="#" data-table="certifications"><i class="fas fa-certificate mr-3"></i> Certifications</a>
+            <a href="#" data-table="education"><i class="fas fa-graduation-cap mr-3"></i> Education</a>
+            <a href="#" data-table="projects"><i class="fas fa-code mr-3"></i> Projects</a>
+            <a href="#" data-table="news"><i class="fas fa-newspaper mr-3"></i> News</a>
+            <a href="#" data-table="services"><i class="fas fa-concierge-bell mr-3"></i> Services</a>
+            <a href="#" data-table="clients"><i class="fas fa-handshake mr-3"></i> Clients</a>
+        </nav>
+        <div class="mt-8 pt-8 border-t border-gray-200">
+            <a href="index.html" class="text-gray-400 hover:text-gray-600"><i class="fas fa-arrow-left mr-2"></i> Back to Site</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-admin">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold" id="pageTitle">Experiences</h1>
+            <button class="btn btn-primary" onclick="openAddModal()"><i class="fas fa-plus mr-2"></i> Add New</button>
+        </div>
+        <div id="tableContainer" class="admin-card">
+            <div class="table-wrap">
+                <table>
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold" id="modalTitle">Add New</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <form id="modalForm">
+                <div id="modalFields"></div>
+                <div class="flex gap-3 mt-4">
+                    <button type="submit" class="btn btn-primary flex-1">Save</button>
+                    <button type="button" onclick="closeModal()" class="btn btn-outline">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentTable = 'experiences';
+        let editingId = null;
+        const tableConfigs = {
+            experiences: {
+                fields: ['title', 'company', 'period', 'location', 'description', 'company_same', 'display_order'],
+                labels: { title: 'Job Title', company: 'Company', period: 'Period (e.g. Apr 2025 - Present)', location: 'Location', description: 'Description', company_same: 'Same Company (checkbox)', display_order: 'Display Order' },
+                types: { company_same: 'checkbox', display_order: 'number' }
+            },
+            certifications: {
+                fields: ['name', 'issuer', 'year', 'credential_id', 'display_order'],
+                labels: { name: 'Certification Name', issuer: 'Issuer', year: 'Year', credential_id: 'Credential ID', display_order: 'Display Order' },
+                types: { display_order: 'number' }
+            },
+            education: {
+                fields: ['degree', 'school', 'year', 'focus', 'gpa', 'display_order'],
+                labels: { degree: 'Degree', school: 'School', year: 'Year', focus: 'Focus Area', gpa: 'GPA', display_order: 'Display Order' },
+                types: { display_order: 'number' }
+            },
+            projects: {
+                fields: ['name', 'description', 'tech', 'year', 'link', 'display_order'],
+                labels: { name: 'Project Name', description: 'Description', tech: 'Technologies (comma separated)', year: 'Year', link: 'Project Link', display_order: 'Display Order' },
+                types: { display_order: 'number' }
+            },
+            news: {
+                fields: ['title', 'content', 'date', 'pinned'],
+                labels: { title: 'Title', content: 'Content', date: 'Date', pinned: 'Pinned (checkbox)' },
+                types: { pinned: 'checkbox', date: 'date' }
+            },
+            services: {
+                fields: ['name', 'description', 'icon', 'display_order'],
+                labels: { name: 'Service Name', description: 'Description', icon: 'Font Awesome Icon (e.g. fas fa-code)', display_order: 'Display Order' },
+                types: { display_order: 'number' }
+            },
+            clients: {
+                fields: ['name', 'logo_url', 'description', 'display_order'],
+                labels: { name: 'Client Name', logo_url: 'Logo URL', description: 'Description', display_order: 'Display Order' },
+                types: { display_order: 'number' }
+            }
+        };
+
+        async function loadData(table) {
+            currentTable = table;
+            const { data, error } = await supabase.from(table).select('*').order('display_order', { ascending: true });
+            if (error) { console.error(error); return; }
+            renderTable(table, data);
+        }
+
+        function renderTable(table, data) {
+            const config = tableConfigs[table];
+            const head = document.getElementById('tableHead');
+            const body = document.getElementById('tableBody');
+            document.getElementById('pageTitle').textContent = table.charAt(0).toUpperCase() + table.slice(1);
+
+            head.innerHTML = `<tr>${config.fields.map(f => `<th>${config.labels[f] || f}</th>`).join('')}<th>Actions</th></tr>`;
+            body.innerHTML = data.map(row => `
+                <tr>
+                    ${config.fields.map(f => {
+                        let val = row[f];
+                        if (f === 'tech' && Array.isArray(val)) val = val.join(', ');
+                        if (f === 'company_same' || f === 'pinned') val = val ? '✅' : '❌';
+                        if (f === 'display_order') val = val ?? '-';
+                        return `<td>${val ?? '-'}</td>`;
+                    }).join('')}
+                    <td>
+                        <button class="btn btn-primary text-xs py-1 px-2 mr-1" onclick="editItem('${row.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger text-xs py-1 px-2" onclick="deleteItem('${row.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = `Add New ${currentTable.slice(0, -1)}`;
+            buildForm({});
+            document.getElementById('modal').classList.add('open');
+        }
+
+        async function editItem(id) {
+            editingId = id;
+            const { data, error } = await supabase.from(currentTable).select('*').eq('id', id).single();
+            if (error) { console.error(error); return; }
+            document.getElementById('modalTitle').textContent = `Edit ${currentTable.slice(0, -1)}`;
+            buildForm(data);
+            document.getElementById('modal').classList.add('open');
+        }
+
+        function buildForm(data) {
+            const config = tableConfigs[currentTable];
+            const container = document.getElementById('modalFields');
+            container.innerHTML = config.fields.map(f => {
+                const type = config.types?.[f] || 'text';
+                const value = data[f] ?? '';
+                const label = config.labels[f] || f;
+                if (type === 'checkbox') {
+                    return `<label><input type="checkbox" name="${f}" ${value ? 'checked' : ''}> ${label}</label>`;
+                }
+                if (type === 'textarea') {
+                    return `<label>${label}</label><textarea name="${f}" rows="3">${value}</textarea>`;
+                }
+                if (f === 'tech' && Array.isArray(value)) {
+                    return `<label>${label}</label><input type="text" name="${f}" value="${value.join(', ')}">`;
+                }
+                return `<label>${label}</label><input type="${type}" name="${f}" value="${value}">`;
+            }).join('');
+        }
+
+        document.getElementById('modalForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const config = tableConfigs[currentTable];
+            const data = {};
+            config.fields.forEach(f => {
+                const el = form.querySelector(`[name="${f}"]`);
+                if (!el) return;
+                if (el.type === 'checkbox') data[f] = el.checked;
+                else if (f === 'tech' && el.value) data[f] = el.value.split(',').map(s => s.trim()).filter(Boolean);
+                else data[f] = el.value;
+            });
+            data.display_order = Number(data.display_order) || 0;
+
+            try {
+                if (editingId) {
+                    await supabase.from(currentTable).update(data).eq('id', editingId);
+                } else {
+                    await supabase.from(currentTable).insert(data);
+                }
+                closeModal();
+                loadData(currentTable);
+            } catch (err) {
+                alert('Error saving: ' + err.message);
+            }
+        });
+
+        async function deleteItem(id) {
+            if (!confirm('Delete this item?')) return;
+            await supabase.from(currentTable).delete().eq('id', id);
+            loadData(currentTable);
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('open');
+            document.getElementById('modalForm').reset();
+        }
+
+        // Sidebar navigation
+        document.querySelectorAll('.sidebar-admin a[data-table]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar-admin a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                loadData(link.dataset.table);
+            });
+        });
+
+        // Load initial
+        loadData('experiences');
+    </script>
+</body>
+</html>
