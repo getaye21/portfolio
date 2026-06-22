@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Getaye Portfolio</title>
+    
+    <!-- Admin-specific favicon (gear icon) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%236366F1'/%3E%3Ctext x='50%25' y='50%25' font-size='65' font-family='Arial' text-anchor='middle' dy='.35em' fill='white'%3E%E2%9A%99%3C/text%3E%3C/svg%3E">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,7 +44,7 @@
     </style>
 </head>
 <body>
-    <!-- Simple password protection -->
+    <!-- Simple password protection – change the password -->
     <script>
         const ADMIN_PASSWORD = "your_secure_password_here"; // CHANGE THIS!
         if (prompt("Enter admin password:") !== ADMIN_PASSWORD) {
@@ -106,7 +110,7 @@
         let editingId = null;
         const tableConfigs = {
             experiences: { fields: ['title', 'company', 'period', 'location', 'description', 'company_same', 'display_order'], labels: { title: 'Job Title', company: 'Company', period: 'Period (e.g. Apr 2025 - Present)', location: 'Location', description: 'Description', company_same: 'Same Company (checkbox)', display_order: 'Display Order' }, types: { company_same: 'checkbox', display_order: 'number' } },
-            certifications: { fields: ['name', 'issuer', 'year', 'credential_id', 'display_order'], labels: { name: 'Certification Name', issuer: 'Issuer', year: 'Year', credential_id: 'Credential ID', display_order: 'Display Order' }, types: { display_order: 'number' } },
+            certifications: { fields: ['name', 'issuer', 'year', 'credential_id', 'file_url', 'verify_url', 'display_order'], labels: { name: 'Certification Name', issuer: 'Issuer', year: 'Year', credential_id: 'Credential ID', file_url: 'File URL (for download)', verify_url: 'Verify URL (for external verification)', display_order: 'Display Order' }, types: { display_order: 'number' } },
             education: { fields: ['degree', 'school', 'year', 'focus', 'gpa', 'display_order'], labels: { degree: 'Degree', school: 'School', year: 'Year', focus: 'Focus Area', gpa: 'GPA', display_order: 'Display Order' }, types: { display_order: 'number' } },
             projects: { fields: ['name', 'description', 'tech', 'year', 'link', 'display_order'], labels: { name: 'Project Name', description: 'Description', tech: 'Technologies (comma separated)', year: 'Year', link: 'Project Link', display_order: 'Display Order' }, types: { display_order: 'number' } },
             news: { fields: ['title', 'content', 'date', 'pinned'], labels: { title: 'Title', content: 'Content', date: 'Date', pinned: 'Pinned (checkbox)' }, types: { pinned: 'checkbox', date: 'date' } },
