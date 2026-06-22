@@ -12,17 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <!-- Tailwind CSS (for development only; replace with PostCSS in production) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Supabase JS (only once) -->
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <!-- EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     
     <style>
-        /* ===== Your existing styles (unchanged) ===== */
         * { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         body { transition: background-color 0.3s ease; overflow-x: hidden; }
         .sidebar {
@@ -66,9 +65,40 @@
         .hero-image-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
         .section-nav-btn { transition: all 0.2s ease; }
         .section-nav-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        
+        /* Interactive Background Animation */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+        }
+        .gradient-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        body.light .gradient-overlay {
+            background: radial-gradient(circle at 20% 50%, rgba(59,130,246,0.08), rgba(139,92,246,0.05), transparent);
+        }
+        body.dark .gradient-overlay {
+            background: radial-gradient(circle at 20% 50%, rgba(59,130,246,0.12), rgba(139,92,246,0.08), transparent);
+        }
     </style>
 </head>
 <body class="light">
+    <!-- Animated Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+    <div class="gradient-overlay"></div>
+
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
         <i class="fas fa-bars"></i>
     </button>
@@ -88,6 +118,8 @@
             <a href="#" data-section="education"><i class="fas fa-graduation-cap"></i> Education</a>
             <a href="#" data-section="certifications"><i class="fas fa-certificate"></i> Certifications</a>
             <a href="#" data-section="projects"><i class="fas fa-code"></i> Projects</a>
+            <!-- New GitHub Repos section -->
+            <a href="#" data-section="github"><i class="fab fa-github"></i> GitHub Repos</a>
             <a href="#" data-section="contact"><i class="fas fa-envelope"></i> Contact</a>
         </nav>
         <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(0,0,0,0.06);">
@@ -95,9 +127,7 @@
                 <i id="theme-icon" class="fas fa-sun text-yellow-500"></i>
                 <span>Toggle Theme</span>
             </button>
-            <a href="admin.html" class="block mt-2 px-4 py-2 rounded-lg bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white transition text-center">
-                <i class="fas fa-cog"></i> Admin Dashboard
-            </a>
+            <!-- Admin link removed – no hint about admin panel -->
         </div>
     </aside>
 
@@ -112,7 +142,7 @@
         const SUPABASE_URL = "https://vedehlwosfutknqhguiv.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlZGVobHdvc2Z1dGtucWhndWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMjQxOTUsImV4cCI6MjA5NzcwMDE5NX0.PU4cyfwNj41flxXXcLL37YgLHIjKhzkkRg4KWmHZ0H0";
 
-        // Initialize Supabase client (no duplicate)
+        // Initialize Supabase client
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ==================== EMAILJS ====================
@@ -183,11 +213,13 @@
                 case 'education': renderEducation(); break;
                 case 'certifications': renderCertifications(); break;
                 case 'projects': renderProjects(); break;
+                case 'github': renderGitHub(); break;
                 case 'contact': renderContact(); break;
                 default: renderHome();
             }
         }
 
+        // ==================== RENDER FUNCTIONS ====================
         function renderHome() {
             const exp = allData.experiences;
             container.innerHTML = `
@@ -352,10 +384,25 @@
                     <div class="grid md:grid-cols-2 gap-4">
                         ${allData.certifications.map(cert => `
                             <div class="glass-card rounded-xl p-4">
-                                <i class="fas fa-certificate text-2xl text-green-500 mr-2"></i>
-                                <span class="font-semibold">${cert.name}</span>
-                                <p class="text-sm text-gray-500">${cert.issuer} • ${cert.year}</p>
-                                ${cert.credential_id ? `<p class="text-xs text-gray-400">ID: ${cert.credential_id}</p>` : ''}
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-certificate text-2xl text-green-500"></i>
+                                    <div class="flex-1">
+                                        <span class="font-semibold">${cert.name}</span>
+                                        <p class="text-sm text-gray-500">${cert.issuer} • ${cert.year}</p>
+                                        ${cert.credential_id ? `<p class="text-xs text-gray-400">ID: ${cert.credential_id}</p>` : ''}
+                                        <!-- Download/Verify button if file_url exists -->
+                                        ${cert.file_url ? `
+                                            <a href="${cert.file_url}" target="_blank" class="inline-block mt-2 text-blue-500 text-sm hover:underline">
+                                                <i class="fas fa-download"></i> View/Download
+                                            </a>
+                                        ` : ''}
+                                        ${cert.verify_url ? `
+                                            <a href="${cert.verify_url}" target="_blank" class="inline-block mt-2 text-blue-500 text-sm hover:underline ml-2">
+                                                <i class="fas fa-check-circle"></i> Verify
+                                            </a>
+                                        ` : ''}
+                                    </div>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
@@ -385,6 +432,49 @@
             `;
         }
 
+        // ==================== GITHUB REPOS ====================
+        function renderGitHub() {
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6"><i class="fab fa-github text-blue-500"></i> My GitHub Repositories</h2>
+                    <div id="github-repos-container" class="grid md:grid-cols-2 gap-6">
+                        <div class="col-span-full text-center py-8 text-gray-500">Loading repositories...</div>
+                    </div>
+                </div>
+            `;
+            
+            fetch('https://api.github.com/users/getaye21/repos?sort=updated&per_page=20')
+                .then(res => {
+                    if (!res.ok) throw new Error('GitHub API error');
+                    return res.json();
+                })
+                .then(repos => {
+                    const container = document.getElementById('github-repos-container');
+                    if (!repos || repos.length === 0) {
+                        container.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500">No public repositories found.</div>`;
+                        return;
+                    }
+                    container.innerHTML = repos.map(repo => `
+                        <div class="glass-card rounded-xl p-5 hover:shadow-lg transition">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-lg font-bold truncate">${repo.name}</h3>
+                                <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full">${repo.language || 'Code'}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">${repo.description || 'No description available.'}</p>
+                            <div class="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                                <span><i class="fas fa-star text-yellow-500"></i> ${repo.stargazers_count}</span>
+                                <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
+                                <a href="${repo.html_url}" target="_blank" class="text-blue-500 hover:underline">View →</a>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(() => {
+                    document.getElementById('github-repos-container').innerHTML = `<div class="col-span-full text-center py-8 text-red-500">⚠️ Failed to load repositories.</div>`;
+                });
+        }
+
+        // ==================== CONTACT ====================
         function renderContact() {
             container.innerHTML = `
                 <div class="max-w-3xl mx-auto">
@@ -437,6 +527,7 @@
             });
         }
 
+        // ==================== THEME TOGGLE ====================
         function initTheme() {
             const saved = localStorage.getItem('theme') || 'light';
             document.body.className = saved;
@@ -455,6 +546,70 @@
             if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !hamburger.contains(e.target)) { sidebar.classList.remove('open'); }
         });
 
+        // ==================== INTERACTIVE BACKGROUND (Particle Network) ====================
+        const canvas = document.getElementById('bg-canvas');
+        let ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationId = null;
+
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            const particleCount = Math.min(80, Math.floor(window.innerWidth * 0.05));
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                });
+            }
+        }
+
+        function drawBackground() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.body.classList.contains('dark');
+            ctx.strokeStyle = isDark ? 'rgba(59,130,246,0.15)' : 'rgba(59,130,246,0.2)';
+            ctx.lineWidth = 0.8;
+            
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    if (Math.sqrt(dx * dx + dy * dy) < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            for (let p of particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = isDark ? 'rgba(59,130,246,0.4)' : 'rgba(59,130,246,0.5)';
+                ctx.fill();
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+            }
+            animationId = requestAnimationFrame(drawBackground);
+        }
+
+        function resizeCanvas() {
+            initCanvas();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        initCanvas();
+        drawBackground();
+
+        // ==================== INIT ====================
         initTheme();
         fetchAllData();
     </script>
