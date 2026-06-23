@@ -3,22 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Getaye Fiseha Tadesse | System Administrator</title>
+    <title>Getaye Fiseha Tadesse | System and Database Officer</title>
     
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%233B82F6'/%3E%3Ctext x='50%25' y='50%25' font-size='70' font-family='Arial' text-anchor='middle' dy='.35em' fill='white'%3EG%3C/text%3E%3C/svg%3E">
     
-    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     
     <style>
@@ -35,46 +27,15 @@
             --sidebar-bg: rgba(18,18,30,0.95);
             --border-color: rgba(255,255,255,0.06);
         }
-        /* Theme: Purple */
-        .theme-purple {
-            --primary: #8B5CF6;
-            --primary-dark: #7c3aed;
-            --primary-light: #c4b5fd;
-            --primary-bg: rgba(139,92,246,0.1);
-        }
-        /* Theme: Green */
-        .theme-green {
-            --primary: #22C55E;
-            --primary-dark: #16a34a;
-            --primary-light: #86efac;
-            --primary-bg: rgba(34,197,94,0.1);
-        }
-        /* Theme: Orange */
-        .theme-orange {
-            --primary: #F59E0B;
-            --primary-dark: #d97706;
-            --primary-light: #fcd34d;
-            --primary-bg: rgba(245,158,11,0.1);
-        }
-        /* Theme: Pink */
-        .theme-pink {
-            --primary: #EC4899;
-            --primary-dark: #db2777;
-            --primary-light: #f9a8d4;
-            --primary-bg: rgba(236,72,153,0.1);
-        }
-        /* Theme: Teal */
-        .theme-teal {
-            --primary: #14B8A6;
-            --primary-dark: #0d9488;
-            --primary-light: #5eead4;
-            --primary-bg: rgba(20,184,166,0.1);
-        }
+        .theme-purple { --primary: #8B5CF6; --primary-dark: #7c3aed; --primary-light: #c4b5fd; --primary-bg: rgba(139,92,246,0.1); }
+        .theme-green { --primary: #22C55E; --primary-dark: #16a34a; --primary-light: #86efac; --primary-bg: rgba(34,197,94,0.1); }
+        .theme-orange { --primary: #F59E0B; --primary-dark: #d97706; --primary-light: #fcd34d; --primary-bg: rgba(245,158,11,0.1); }
+        .theme-pink { --primary: #EC4899; --primary-dark: #db2777; --primary-light: #f9a8d4; --primary-bg: rgba(236,72,153,0.1); }
+        .theme-teal { --primary: #14B8A6; --primary-dark: #0d9488; --primary-light: #5eead4; --primary-bg: rgba(20,184,166,0.1); }
 
         * { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         body { transition: background-color 0.3s ease, color 0.2s ease; overflow-x: hidden; }
         
-        /* Sidebar styles with collapse */
         .sidebar {
             position: fixed;
             top: 0;
@@ -100,37 +61,15 @@
         .sidebar.collapsed .theme-selector label {
             display: none;
         }
-        .sidebar.collapsed .sidebar-logo {
-            justify-content: center;
-        }
-        .sidebar.collapsed .sidebar-nav a {
-            justify-content: center;
-            padding: 0.75rem;
-        }
-        .sidebar.collapsed .sidebar-nav a i {
-            font-size: 1.3rem;
-            margin: 0;
-        }
-        .sidebar.collapsed .sidebar-footer {
-            align-items: center;
-        }
-        .sidebar.collapsed .sidebar-footer button {
-            justify-content: center;
-            padding: 0.75rem;
-        }
-        .sidebar.collapsed .sidebar-footer button i {
-            font-size: 1.2rem;
-        }
-        .sidebar.collapsed .theme-selector {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .sidebar.collapsed .theme-selector .theme-dot {
-            width: 28px;
-            height: 28px;
-            margin: 0 auto;
-        }
-        /* Toggle button for collapse */
+        .sidebar.collapsed .sidebar-logo { justify-content: center; }
+        .sidebar.collapsed .sidebar-nav a { justify-content: center; padding: 0.75rem; }
+        .sidebar.collapsed .sidebar-nav a i { font-size: 1.3rem; margin: 0; }
+        .sidebar.collapsed .sidebar-footer { align-items: center; }
+        .sidebar.collapsed .sidebar-footer button { justify-content: center; padding: 0.75rem; }
+        .sidebar.collapsed .sidebar-footer button i { font-size: 1.2rem; }
+        .sidebar.collapsed .theme-selector { flex-direction: column; gap: 0.5rem; }
+        .sidebar.collapsed .theme-selector .theme-dot { width: 28px; height: 28px; margin: 0 auto; }
+        
         .sidebar-toggle {
             position: absolute;
             bottom: 1rem;
@@ -150,17 +89,9 @@
             transition: transform 0.3s;
             z-index: 10;
         }
-        .sidebar.collapsed .sidebar-toggle {
-            transform: rotate(180deg);
-        }
-        .sidebar-toggle:hover {
-            transform: scale(1.1);
-        }
-        .sidebar.collapsed .sidebar-toggle:hover {
-            transform: scale(1.1) rotate(180deg);
-        }
-
-        body.dark .sidebar { --sidebar-bg: rgba(18,18,30,0.95); }
+        .sidebar.collapsed .sidebar-toggle { transform: rotate(180deg); }
+        .sidebar-toggle:hover { transform: scale(1.1); }
+        .sidebar.collapsed .sidebar-toggle:hover { transform: scale(1.1) rotate(180deg); }
 
         .sidebar-logo {
             font-size: 1.5rem;
@@ -230,7 +161,6 @@
         }
         .sidebar-footer button i { width: 20px; text-align: center; }
 
-        /* Theme selector */
         .theme-selector {
             display: flex;
             gap: 0.5rem;
@@ -246,9 +176,7 @@
             transition: all 0.2s;
             flex-shrink: 0;
         }
-        .theme-selector .theme-dot:hover {
-            transform: scale(1.1);
-        }
+        .theme-selector .theme-dot:hover { transform: scale(1.1); }
         .theme-selector .theme-dot.active {
             border-color: var(--primary);
             box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary);
@@ -261,18 +189,14 @@
             margin-top: 0.2rem;
         }
 
-        /* Main content */
         .main-content {
             margin-left: 280px;
             min-height: 100vh;
             padding: 2rem;
             transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .sidebar.collapsed ~ .main-content {
-            margin-left: 80px;
-        }
+        .sidebar.collapsed ~ .main-content { margin-left: 80px; }
 
-        /* Mobile hamburger – top right */
         .hamburger {
             display: none;
             position: fixed;
@@ -316,14 +240,12 @@
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); width: 280px; }
             .sidebar.open { transform: translateX(0); }
-            .sidebar.collapsed { width: 280px; } /* Override collapse on mobile */
+            .sidebar.collapsed { width: 280px; }
             .sidebar.collapsed .sidebar-logo span,
             .sidebar.collapsed .sidebar-nav a span,
             .sidebar.collapsed .sidebar-nav a .nav-text,
             .sidebar.collapsed .sidebar-footer .footer-text,
-            .sidebar.collapsed .theme-selector label {
-                display: inline;
-            }
+            .sidebar.collapsed .theme-selector label { display: inline; }
             .sidebar.collapsed .sidebar-logo { justify-content: flex-start; }
             .sidebar.collapsed .sidebar-nav a { justify-content: flex-start; padding: 0.75rem 1rem; }
             .sidebar.collapsed .sidebar-nav a i { font-size: 1.1rem; }
@@ -331,10 +253,9 @@
             .sidebar.collapsed .theme-selector { flex-direction: row; }
             .main-content { margin-left: 0 !important; padding: 1rem; padding-top: 5rem; }
             .hamburger { display: flex; align-items: center; }
-            .sidebar-toggle { display: none; } /* hide collapse toggle on mobile */
+            .sidebar-toggle { display: none; }
         }
 
-        /* Rest of styles */
         .gradient-text {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark), #EC4899);
             background-size: 200% auto;
@@ -432,7 +353,6 @@
             color: white !important;
         }
 
-        /* Interactive Background */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -484,22 +404,17 @@
     </style>
 </head>
 <body class="light theme-default">
-    <!-- Animated Background -->
     <canvas id="bg-canvas"></canvas>
     <div class="gradient-overlay"></div>
 
-    <!-- Mobile Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Hamburger – Top Right (mobile) -->
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
         <i class="fas fa-bars"></i>
         <span class="menu-label">Menu</span>
     </button>
 
-    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-        <!-- Collapse toggle (desktop only) -->
         <button class="sidebar-toggle" id="sidebarToggle" title="Collapse/Expand sidebar">
             <i class="fas fa-chevron-left"></i>
         </button>
@@ -539,14 +454,12 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <div id="content-container">
             <div class="flex justify-center items-center h-64"><div class="spinner"></div></div>
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="footer" style="margin-left:280px; padding-left:2rem; padding-right:2rem;">
         <div class="container mx-auto">
             <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -597,7 +510,7 @@
         const overlay = document.getElementById('sidebarOverlay');
         const sidebarToggle = document.getElementById('sidebarToggle');
 
-        // ==================== SIDEBAR TOGGLE (Desktop) ====================
+        // ==================== SIDEBAR ====================
         let isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
         if (isSidebarCollapsed && window.innerWidth > 768) {
             sidebar.classList.add('collapsed');
@@ -606,14 +519,12 @@
             if (window.innerWidth > 768) {
                 sidebar.classList.toggle('collapsed');
                 localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-                // Adjust footer margin
                 const footer = document.querySelector('.footer');
                 if (footer) {
                     footer.style.marginLeft = sidebar.classList.contains('collapsed') ? '80px' : '280px';
                 }
             }
         });
-        // Listen for window resize to reset footer margin
         window.addEventListener('resize', () => {
             const footer = document.querySelector('.footer');
             if (footer) {
@@ -625,7 +536,6 @@
             }
         });
 
-        // ==================== MOBILE SIDEBAR ====================
         function toggleSidebar() {
             sidebar.classList.toggle('open');
             overlay.classList.toggle('active');
@@ -649,20 +559,15 @@
 
         // ==================== THEMES ====================
         function applyTheme(theme) {
-            // Remove all theme classes
             document.body.classList.remove('theme-default', 'theme-purple', 'theme-green', 'theme-orange', 'theme-pink', 'theme-teal');
             if (theme !== 'default') {
                 document.body.classList.add('theme-' + theme);
             }
             localStorage.setItem('theme', theme);
-            // Update active dot
             document.querySelectorAll('.theme-dot').forEach(dot => {
                 dot.classList.toggle('active', dot.dataset.theme === theme);
             });
-            // Also update gradient text and primary colors dynamically? Using CSS variables handles it.
         }
-
-        // Load saved theme
         const savedTheme = localStorage.getItem('theme') || 'default';
         applyTheme(savedTheme);
         document.querySelectorAll('.theme-dot').forEach(dot => {
@@ -679,7 +584,7 @@
             renderSection(section);
         }
 
-        // ==================== FETCH DATA ====================
+        // ==================== FETCH DATA (Original Working Version) ====================
         async function fetchAllData() {
             try {
                 const [experiences, certifications, education, projects, news, services, clients] = await Promise.all([
@@ -723,9 +628,359 @@
             }
         }
 
-        // ... (all render functions remain the same as before – omitted for brevity, they are unchanged from previous version)
-        // We'll include them in the final answer, but to save space I'm abbreviating.
-        // In production, copy the full render functions from the previous response.
+        // ==================== RENDER: HOME ====================
+        function renderHome() {
+            const exp = allData.experiences;
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <div class="hero-image-container rounded-2xl shadow-xl">
+                        <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=400&fit=crop" alt="System Administration" onerror="this.style.display='none'">
+                        <div class="hero-image-overlay">
+                            <div class="text-center">
+                                <h1 class="text-4xl md:text-5xl font-bold">Hi, I'm <span class="gradient-text">Getaye Fiseha</span></h1>
+                                <p class="text-xl text-gray-300 mt-2">System & Database Officer | Full Stack Developer</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="glass-card rounded-xl p-4 text-center"><div class="text-3xl font-bold text-blue-500">${exp.length}</div><div class="text-sm text-gray-500">Experiences</div></div>
+                        <div class="glass-card rounded-xl p-4 text-center"><div class="text-3xl font-bold text-purple-500">${allData.projects.length}</div><div class="text-sm text-gray-500">Projects</div></div>
+                        <div class="glass-card rounded-xl p-4 text-center"><div class="text-3xl font-bold text-green-500">${allData.certifications.length}</div><div class="text-sm text-gray-500">Certifications</div></div>
+                        <div class="glass-card rounded-xl p-4 text-center"><div class="text-3xl font-bold text-yellow-500">${allData.clients.length}</div><div class="text-sm text-gray-500">Clients</div></div>
+                    </div>
+                    ${allData.news.length > 0 ? `
+                        <div class="glass-card rounded-xl p-6">
+                            <h2 class="text-xl font-bold mb-4"><i class="fas fa-newspaper text-blue-500"></i> Latest News</h2>
+                            ${allData.news.slice(0, 3).map(n => `
+                                <div class="news-card ${n.pinned ? 'pinned' : ''} py-2 ${n.pinned ? 'bg-yellow-50/50 dark:bg-yellow-900/10 rounded-lg px-3' : ''}">
+                                    <div class="flex items-center gap-2">${n.pinned ? '<span class="text-yellow-500 text-xs font-bold">📌 PINNED</span>' : ''}<span class="text-xs text-gray-400">${new Date(n.date).toLocaleDateString()}</span></div>
+                                    <h3 class="font-semibold">${n.title}</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">${n.content}</p>
+                                </div>
+                            `).join('')}
+                            <a href="#" onclick="navigateTo('news')" class="text-blue-500 text-sm hover:underline mt-2 inline-block">View all news →</a>
+                        </div>
+                    ` : ''}
+                    <div class="glass-card rounded-xl p-6 text-center">
+                        <p class="text-lg font-medium">💼 Available for opportunities</p>
+                        <p class="text-sm text-gray-500">🌍 Remote | Full-time | Scholarships | Partnerships</p>
+                        <a href="#" onclick="navigateTo('contact')" class="mt-4 inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">Let's Connect →</a>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: ABOUT (with image) ====================
+        function renderAbout() {
+            container.innerHTML = `
+                <div class="max-w-3xl mx-auto space-y-6">
+                    <h2 class="text-3xl font-bold">About Me</h2>
+                    <div class="flex justify-center">
+                        <img src="https://i.ibb.co/pBXWN7B6/IMG-20260623-121407-499.jpg" 
+                             alt="Getaye Fiseha Tadesse" 
+                             class="about-image max-w-xs md:max-w-sm rounded-2xl shadow-xl">
+                    </div>
+                    <div class="glass-card rounded-xl p-6">
+                        <p class="text-lg leading-relaxed">I am a passionate IT professional currently working as a System and Database Officer at Ahadu Bank, where I manage Active Directory, Oracle Database, Nutanix Prism virtualization, and mail exchange systems. With a strong foundation in Electrical and Computer Engineering from Wollo University (GPA: 3.91) and ongoing MSc in Computer Science at Addis Ababa University, I bridge the gap between infrastructure engineering and modern software development.</p>
+                        <p class="text-lg leading-relaxed mt-4">My technical expertise includes Linux system administration, virtualization (Nutanix AHV), hyper-converged infrastructure, cloud databases, and full-stack development with React, Node.js, and Python.</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-server text-3xl text-blue-500"></i><p class="font-semibold mt-2">System Admin</p></div>
+                        <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-code text-3xl text-blue-500"></i><p class="font-semibold mt-2">Full Stack Dev</p></div>
+                        <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-brain text-3xl text-blue-500"></i><p class="font-semibold mt-2">AI Engineer</p></div>
+                        <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-building text-3xl text-blue-500"></i><p class="font-semibold mt-2">Infrastructure Eng</p></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: NEWS ====================
+        function renderNews() {
+            if (allData.news.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500">No news yet. Check back soon!</div>`;
+                return;
+            }
+            container.innerHTML = `
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6">📰 News & Announcements</h2>
+                    ${allData.news.map(n => `
+                        <div class="glass-card rounded-xl p-4 mb-4 ${n.pinned ? 'border-l-4 border-yellow-500' : ''}">
+                            <div class="flex items-center gap-2 text-sm text-gray-400">${n.pinned ? '<span class="text-yellow-500 font-bold">📌</span>' : ''}${new Date(n.date).toLocaleDateString()}</div>
+                            <h3 class="text-xl font-bold">${n.title}</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mt-1">${n.content}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: SERVICES ====================
+        function renderServices() {
+            if (allData.services.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500">No services listed yet.</div>`;
+                return;
+            }
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6">🛠️ My Services</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        ${allData.services.map(s => `
+                            <div class="glass-card rounded-xl p-6 text-center">
+                                <i class="${s.icon || 'fas fa-cog'} text-4xl text-blue-500 mb-4"></i>
+                                <h3 class="text-xl font-bold">${s.name}</h3>
+                                <p class="text-gray-600 dark:text-gray-400 mt-2">${s.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: CLIENTS ====================
+        function renderClients() {
+            if (allData.clients.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500">No clients yet.</div>`;
+                return;
+            }
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6">🤝 My Clients</h2>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        ${allData.clients.map(c => `
+                            <div class="glass-card rounded-xl p-6 text-center">
+                                ${c.logo_url ? `<img src="${c.logo_url}" alt="${c.name}" class="client-logo mx-auto mb-4">` : ''}
+                                <h3 class="font-bold">${c.name}</h3>
+                                <p class="text-sm text-gray-500 mt-1">${c.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: EXPERIENCE ====================
+        function renderExperience() {
+            if (allData.experiences.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500">No experience yet.</div>`;
+                return;
+            }
+            const grouped = allData.experiences.reduce((acc, exp) => {
+                if (!acc[exp.company]) acc[exp.company] = [];
+                acc[exp.company].push(exp);
+                return acc;
+            }, {});
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6">💼 Work Experience</h2>
+                    ${Object.entries(grouped).map(([company, exps]) => `
+                        <div class="mb-8">
+                            <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400">${company}</h3>
+                            ${exps.map(exp => `
+                                <div class="glass-card rounded-xl p-5 mt-3 ml-4 border-l-4 border-blue-500">
+                                    <div class="flex justify-between items-start flex-wrap">
+                                        <div>
+                                            <h4 class="text-xl font-bold">${exp.title}</h4>
+                                            <p class="text-gray-500 text-sm">${exp.period} • ${exp.location || ''}</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-400 mt-2">${exp.description}</p>
+                                </div>
+                            `).join('')}
+                            ${exps.length > 1 ? `<div class="text-sm text-gray-400 mt-2 ml-4">${exps.length} positions at ${company}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: EDUCATION ====================
+        function renderEducation() {
+            if (allData.education.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500">No education yet.</div>`;
+                return;
+            }
+            container.innerHTML = `
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6">🎓 Education</h2>
+                    ${allData.education.map(edu => `
+                        <div class="glass-card rounded-xl p-5 mb-4 border-l-4 border-green-500">
+                            <h3 class="text-xl font-bold">${edu.degree}</h3>
+                            <p class="text-green-600 dark:text-green-400 font-semibold">${edu.school}</p>
+                            <p class="text-gray-500 text-sm">${edu.year}</p>
+                            ${edu.gpa ? `<p class="text-sm text-gray-500">GPA: ${edu.gpa}</p>` : ''}
+                            ${edu.focus ? `<p class="text-sm text-gray-500">Focus: ${edu.focus}</p>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: CERTIFICATIONS ====================
+        function renderCertifications() {
+            if (allData.certifications.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500">No certifications yet.</div>`;
+                return;
+            }
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6">📜 Certifications</h2>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        ${allData.certifications.map(cert => `
+                            <div class="glass-card rounded-xl p-4">
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-certificate text-2xl text-green-500"></i>
+                                    <div class="flex-1">
+                                        <span class="font-semibold">${cert.name}</span>
+                                        <p class="text-sm text-gray-500">${cert.issuer} • ${cert.year}</p>
+                                        ${cert.credential_id ? `<p class="text-xs text-gray-400">ID: ${cert.credential_id}</p>` : ''}
+                                        ${cert.file_url ? `
+                                            <a href="${cert.file_url}" target="_blank" class="inline-block mt-2 text-blue-500 text-sm hover:underline">
+                                                <i class="fas fa-download"></i> View/Download
+                                            </a>
+                                        ` : ''}
+                                        ${cert.verify_url ? `
+                                            <a href="${cert.verify_url}" target="_blank" class="inline-block mt-2 text-blue-500 text-sm hover:underline ml-2">
+                                                <i class="fas fa-check-circle"></i> Verify
+                                            </a>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: PROJECTS ====================
+        function renderProjects() {
+            if (allData.projects.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500">No projects yet.</div>`;
+                return;
+            }
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6">💻 Projects</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        ${allData.projects.map(p => `
+                            <div class="glass-card rounded-xl p-6">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="text-xl font-bold">${p.name}</h3>
+                                    <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full">${p.year || ''}</span>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-400 text-sm mt-2">${p.description}</p>
+                                <div class="flex flex-wrap gap-2 mt-3">${p.tech ? p.tech.map(t => `<span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md text-xs">${t}</span>`).join('') : ''}</div>
+                                ${p.link ? `<a href="${p.link}" target="_blank" class="text-blue-500 text-sm hover:underline mt-3 inline-block">View Project →</a>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: GITHUB ====================
+        function renderGitHub() {
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6"><i class="fab fa-github text-blue-500"></i> My GitHub Repositories</h2>
+                    <div id="github-repos-container" class="grid md:grid-cols-2 gap-6">
+                        <div class="col-span-full text-center py-8 text-gray-500">Loading repositories...</div>
+                    </div>
+                </div>
+            `;
+            
+            fetch('https://api.github.com/users/getaye21/repos?sort=updated&per_page=20')
+                .then(res => {
+                    if (!res.ok) throw new Error('GitHub API error');
+                    return res.json();
+                })
+                .then(repos => {
+                    const container = document.getElementById('github-repos-container');
+                    if (!repos || repos.length === 0) {
+                        container.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500">No public repositories found.</div>`;
+                        return;
+                    }
+                    container.innerHTML = repos.map(repo => `
+                        <div class="glass-card rounded-xl p-5 hover:shadow-lg transition">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-lg font-bold truncate">${repo.name}</h3>
+                                <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full">${repo.language || 'Code'}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">${repo.description || 'No description available.'}</p>
+                            <div class="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                                <span><i class="fas fa-star text-yellow-500"></i> ${repo.stargazers_count}</span>
+                                <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
+                                <a href="${repo.html_url}" target="_blank" class="text-blue-500 hover:underline">View →</a>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(() => {
+                    document.getElementById('github-repos-container').innerHTML = `<div class="col-span-full text-center py-8 text-red-500">⚠️ Failed to load repositories.</div>`;
+                });
+        }
+
+        // ==================== RENDER: CONTACT ====================
+        function renderContact() {
+            container.innerHTML = `
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6">📧 Let's Connect</h2>
+                    <div class="glass-card rounded-2xl p-8">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-xl font-semibold mb-4">Contact Details</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3"><i class="fas fa-envelope text-blue-500 w-6"></i><span>getayefiseha21@gmail.com</span></div>
+                                    <div class="flex items-center gap-3"><i class="fas fa-phone text-blue-500 w-6"></i><span>+251-980574725</span></div>
+                                    <div class="flex items-center gap-3"><i class="fas fa-map-marker-alt text-blue-500 w-6"></i><span>Addis Ababa, Ethiopia</span></div>
+                                    <div class="flex items-center gap-3"><i class="fab fa-linkedin text-blue-500 w-6"></i><a href="https://www.linkedin.com/in/getaye-fiseha-tadesse/" target="_blank" class="hover:text-blue-500">LinkedIn</a></div>
+                                    <div class="flex items-center gap-3"><i class="fab fa-github text-blue-500 w-6"></i><a href="https://github.com/getaye21" target="_blank" class="hover:text-blue-500">GitHub</a></div>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold mb-4">Send a Message</h3>
+                                <form id="contact-form" class="space-y-4">
+                                    <input type="text" id="form-name" placeholder="Your name" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <input type="email" id="form-email" placeholder="Your email" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <input type="text" id="form-subject" placeholder="Subject" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <textarea id="form-message" rows="3" placeholder="Your message..." required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                                    <button type="submit" id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">Send Message</button>
+                                </form>
+                                <div id="form-status" class="mt-3 text-sm text-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('contact-form')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('form-name').value;
+                const email = document.getElementById('form-email').value;
+                const subject = document.getElementById('form-subject').value;
+                const message = document.getElementById('form-message').value;
+                const status = document.getElementById('form-status');
+                const btn = document.getElementById('submit-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Sending...';
+                status.innerHTML = '<span class="text-blue-500">Sending...</span>';
+                try {
+                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                        from_name: name,
+                        from_email: email,
+                        subject: subject,
+                        message: message
+                    });
+                    status.innerHTML = '<span class="text-green-600">✓ Message sent!</span>';
+                    document.getElementById('contact-form').reset();
+                    setTimeout(() => status.innerHTML = '', 5000);
+                } catch (error) {
+                    status.innerHTML = '<span class="text-red-500">Failed to send. Please try again.</span>';
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Send Message';
+                }
+            });
+        }
 
         // ==================== THEME TOGGLE (Light/Dark) ====================
         function initTheme() {
@@ -774,9 +1029,7 @@
             if (!ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const isDark = document.body.classList.contains('dark');
-            // Use primary color from CSS variable
-            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#3B82F6';
-            ctx.strokeStyle = isDark ? `rgba(59,130,246,0.15)` : `rgba(59,130,246,0.2)`;
+            ctx.strokeStyle = isDark ? 'rgba(59,130,246,0.15)' : 'rgba(59,130,246,0.2)';
             ctx.lineWidth = 0.8;
             
             for (let i = 0; i < particles.length; i++) {
@@ -795,7 +1048,7 @@
             for (let p of particles) {
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = isDark ? `rgba(59,130,246,0.4)` : `rgba(59,130,246,0.5)`;
+                ctx.fillStyle = isDark ? 'rgba(59,130,246,0.4)' : 'rgba(59,130,246,0.5)';
                 ctx.fill();
                 p.x += p.vx;
                 p.y += p.vy;
