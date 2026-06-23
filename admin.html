@@ -347,6 +347,7 @@
         <a href="#" data-table="news"><i class="fas fa-newspaper"></i> News</a>
         <a href="#" data-table="services"><i class="fas fa-concierge-bell"></i> Services</a>
         <a href="#" data-table="clients"><i class="fas fa-handshake"></i> Clients</a>
+        <a href="#" data-table="skills"><i class="fas fa-tasks"></i> Skills</a>
         <div style="border-top:1px solid #e2e8f0;margin:1rem 0;"></div>
         <a href="index.html" style="color:#94a3b8;"><i class="fas fa-arrow-left"></i> Back to Site</a>
     </aside>
@@ -483,6 +484,16 @@
                     name: 'Client Name *',
                     logo_url: 'Logo URL',
                     description: 'Description',
+                    display_order: 'Display Order (number)'
+                },
+                types: { display_order: 'number' },
+                required: ['name']
+            },
+            skills: {
+                fields: ['name', 'category', 'display_order'],
+                labels: {
+                    name: 'Skill Name *',
+                    category: 'Category (e.g. Programming, System Admin)',
                     display_order: 'Display Order (number)'
                 },
                 types: { display_order: 'number' },
