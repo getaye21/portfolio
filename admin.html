@@ -14,7 +14,6 @@
     <style>
         * { font-family: 'Inter', sans-serif; }
         body { background: #f1f5f9; }
-        
         .admin-topbar {
             background: white;
             border-bottom: 1px solid #e2e8f0;
@@ -66,7 +65,6 @@
             background: #fee2e2;
             color: #ef4444;
         }
-        
         .sidebar-admin {
             width: 240px;
             background: white;
@@ -104,13 +102,11 @@
             padding: 1rem 1rem 0.5rem;
             font-weight: 600;
         }
-        
         .main-admin {
             margin-left: 240px;
             padding: 2rem;
             margin-top: 0;
         }
-        
         .admin-card {
             background: white;
             border-radius: 16px;
@@ -121,7 +117,6 @@
         .admin-card:hover {
             box-shadow: 0 4px 12px rgba(0,0,0,0.06);
         }
-        
         .btn {
             padding: 0.5rem 1.25rem;
             border-radius: 10px;
@@ -168,7 +163,6 @@
             padding: 0.25rem 0.75rem;
             font-size: 0.8rem;
         }
-        
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th {
@@ -190,7 +184,6 @@
         }
         tr:hover td { background: #f8fafc; }
         .table-actions { display: flex; gap: 0.5rem; }
-        
         .modal {
             display: none;
             position: fixed;
@@ -283,7 +276,6 @@
             border-top: 1px solid #e2e8f0;
         }
         .modal-content .form-actions button { flex: 1; }
-        
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -304,7 +296,6 @@
             from { opacity: 0; transform: translateY(20px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        
         @media (max-width: 768px) {
             .sidebar-admin { display: none; }
             .main-admin { margin-left: 0; padding: 1rem; }
@@ -318,7 +309,7 @@
 <body>
     <!-- Password Protection -->
     <script>
-        const ADMIN_PASSWORD = "your_secure_password_here"; // CHANGE THIS!
+        const ADMIN_PASSWORD = "getaye"; // CHANGE THIS!
         if (prompt("Enter admin password:") !== ADMIN_PASSWORD) {
             document.body.innerHTML = `
                 <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f1f5f9;font-family:'Inter',sans-serif;">
@@ -405,7 +396,6 @@
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlZGVobHdvc2Z1dGtucWhndWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMjQxOTUsImV4cCI6MjA5NzcwMDE5NX0.PU4cyfwNj41flxXXcLL37YgLHIjKhzkkRg4KWmHZ0H0";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ==================== STATE ====================
         let currentTable = 'experiences';
         let editingId = null;
         let currentData = [];
@@ -500,7 +490,6 @@
             }
         };
 
-        // ==================== TOAST ====================
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -517,7 +506,6 @@
             }
         }
 
-        // ==================== LOAD DATA ====================
         async function loadData(table) {
             currentTable = table;
             try {
@@ -539,7 +527,6 @@
             }
         }
 
-        // ==================== RENDER TABLE ====================
         function renderTable(table, data) {
             const config = tableConfigs[table];
             const head = document.getElementById('tableHead');
@@ -578,7 +565,6 @@
             `).join('');
         }
 
-        // ==================== MODAL ====================
         function openAddModal() {
             editingId = null;
             document.getElementById('modalTitle').textContent = `Add New ${currentTable.slice(0, -1)}`;
@@ -625,7 +611,6 @@
             }).join('');
         }
 
-        // ==================== SAVE / DELETE ====================
         document.getElementById('modalForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const form = e.target;
@@ -700,7 +685,6 @@
             document.getElementById('modalForm').reset();
         }
 
-        // ==================== NAVIGATION ====================
         document.querySelectorAll('.sidebar-admin a[data-table]').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -710,13 +694,11 @@
             });
         });
 
-        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
             if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); openAddModal(); }
         });
 
-        // Initial load
         loadData('experiences');
     </script>
 </body>
