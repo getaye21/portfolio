@@ -401,6 +401,17 @@
             background-clip: text;
             color: transparent;
         }
+
+        /* ===== PRINT STYLES FOR CV ===== */
+        @media print {
+            .sidebar, .hamburger, .gradient-overlay, #bg-canvas, #theme-toggle, .theme-selector, .sidebar-toggle, .section-nav-btn, .footer, .no-print { display: none !important; }
+            .main-content { margin-left: 0 !important; padding: 0 !important; }
+            #content-container { max-width: 100% !important; padding: 2rem !important; }
+            .glass-card { background: white !important; border: 1px solid #ddd !important; box-shadow: none !important; }
+            body { background: white !important; color: black !important; }
+            .gradient-text { color: #3B82F6 !important; background: none !important; -webkit-text-fill-color: #3B82F6 !important; }
+            .cv-print-section { page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body class="light theme-default">
@@ -434,6 +445,8 @@
             <a href="#" data-section="certifications"><i class="fas fa-certificate"></i><span class="nav-text">Certifications</span></a>
             <a href="#" data-section="projects"><i class="fas fa-code"></i><span class="nav-text">Projects</span></a>
             <a href="#" data-section="github"><i class="fab fa-github"></i><span class="nav-text">GitHub Repos</span></a>
+            <!-- New CV button -->
+            <a href="#" data-section="cv"><i class="fas fa-file-alt"></i><span class="nav-text">CV / Resume</span></a>
             <a href="#" data-section="contact"><i class="fas fa-envelope"></i><span class="nav-text">Contact</span></a>
         </nav>
         <div class="sidebar-footer">
@@ -623,6 +636,7 @@
                 case 'certifications': renderCertifications(); break;
                 case 'projects': renderProjects(); break;
                 case 'github': renderGitHub(); break;
+                case 'cv': renderCV(); break;
                 case 'contact': renderContact(); break;
                 default: renderHome();
             }
@@ -670,8 +684,16 @@
             `;
         }
 
-        // ==================== RENDER: ABOUT (with image) ====================
+        // ==================== RENDER: ABOUT (with birthday & age) ====================
         function renderAbout() {
+            // Calculate age from birthday (May 1, 1999)
+            const birthDate = new Date(1999, 4, 1); // May is month 4 (0-indexed)
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
             container.innerHTML = `
                 <div class="max-w-3xl mx-auto space-y-6">
                     <h2 class="text-3xl font-bold">About Me</h2>
@@ -683,12 +705,149 @@
                     <div class="glass-card rounded-xl p-6">
                         <p class="text-lg leading-relaxed">I am a passionate IT professional currently working as a System and Database Officer at Ahadu Bank, where I manage Active Directory, Oracle Database, Nutanix Prism virtualization, and mail exchange systems. With a strong foundation in Electrical and Computer Engineering from Wollo University (GPA: 3.91) and ongoing MSc in Computer Science at Addis Ababa University, I bridge the gap between infrastructure engineering and modern software development.</p>
                         <p class="text-lg leading-relaxed mt-4">My technical expertise includes Linux system administration, virtualization (Nutanix AHV), hyper-converged infrastructure, cloud databases, and full-stack development with React, Node.js, and Python.</p>
+                        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                            <p class="text-sm"><i class="fas fa-birthday-cake text-blue-500 mr-2"></i> <strong>Birthday:</strong> May 1, 1999 &nbsp;|&nbsp; <strong>Age:</strong> ${age} years</p>
+                        </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-server text-3xl text-blue-500"></i><p class="font-semibold mt-2">System Admin</p></div>
                         <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-code text-3xl text-blue-500"></i><p class="font-semibold mt-2">Full Stack Dev</p></div>
                         <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-brain text-3xl text-blue-500"></i><p class="font-semibold mt-2">AI Engineer</p></div>
                         <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-building text-3xl text-blue-500"></i><p class="font-semibold mt-2">Infrastructure Eng</p></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== RENDER: CV / RESUME ====================
+        function renderCV() {
+            const { experiences, education, certifications, projects, skills } = allData;
+            const fullName = "Getaye Fiseha Tadesse";
+            const email = "getayefiseha21@gmail.com";
+            const phone = "+251-980574725";
+            const location = "Addis Ababa, Ethiopia";
+            const linkedin = "https://www.linkedin.com/in/getaye-fiseha-tadesse/";
+            const github = "https://github.com/getaye21";
+
+            // Calculate age again (for CV)
+            const birthDate = new Date(1999, 4, 1);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto cv-print-section" id="cv-content">
+                    <div class="flex justify-between items-center mb-6 no-print">
+                        <h2 class="text-3xl font-bold"><i class="fas fa-file-alt text-blue-500"></i> Curriculum Vitae</h2>
+                        <button onclick="window.print()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                        </button>
+                    </div>
+                    <div class="glass-card rounded-xl p-8">
+                        <!-- Header -->
+                        <div class="text-center border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
+                            <h1 class="text-4xl font-bold gradient-text">${fullName}</h1>
+                            <p class="text-xl text-gray-600 dark:text-gray-300 mt-2">System & Database Officer | Full Stack Developer</p>
+                            <div class="flex flex-wrap justify-center gap-4 text-sm text-gray-500 mt-3">
+                                <span><i class="fas fa-envelope mr-1"></i> ${email}</span>
+                                <span><i class="fas fa-phone mr-1"></i> ${phone}</span>
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> ${location}</span>
+                                <span><i class="fab fa-linkedin mr-1"></i> <a href="${linkedin}" target="_blank" class="text-blue-500 hover:underline">LinkedIn</a></span>
+                                <span><i class="fab fa-github mr-1"></i> <a href="${github}" target="_blank" class="text-blue-500 hover:underline">GitHub</a></span>
+                            </div>
+                            <div class="text-sm text-gray-400 mt-2">
+                                <i class="fas fa-birthday-cake mr-1"></i> Birthday: May 1, 1999 (${age} years)
+                            </div>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold border-l-4 border-blue-500 pl-3 mb-3">Professional Summary</h3>
+                            <p class="text-gray-700 dark:text-gray-300 leading-relaxed">Dedicated System and Database Officer with expertise in Oracle Database, Nutanix virtualization, Active Directory, and enterprise IT infrastructure. Currently serving at Ahadu Bank, managing mission-critical systems while pursuing MSc in Computer Science at AAU. Passionate about bridging infrastructure engineering with modern software development and AI research.</p>
+                        </div>
+
+                        <!-- Experience -->
+                        ${experiences.length ? `
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold border-l-4 border-purple-500 pl-3 mb-3">Work Experience</h3>
+                            ${experiences.map(exp => `
+                                <div class="mb-4 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
+                                    <div class="flex justify-between items-start flex-wrap">
+                                        <div>
+                                            <h4 class="font-bold text-lg">${exp.title}</h4>
+                                            <p class="text-blue-600 dark:text-blue-400 font-medium">${exp.company}</p>
+                                        </div>
+                                        <span class="text-sm text-gray-500">${exp.period}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">${exp.description}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+
+                        <!-- Education -->
+                        ${education.length ? `
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold border-l-4 border-green-500 pl-3 mb-3">Education</h3>
+                            ${education.map(edu => `
+                                <div class="mb-3 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
+                                    <div class="flex justify-between items-start flex-wrap">
+                                        <div>
+                                            <h4 class="font-bold">${edu.degree}</h4>
+                                            <p class="text-gray-600 dark:text-gray-400">${edu.school}</p>
+                                        </div>
+                                        <span class="text-sm text-gray-500">${edu.year}</span>
+                                    </div>
+                                    ${edu.gpa ? `<p class="text-sm text-gray-500">GPA: ${edu.gpa}</p>` : ''}
+                                    ${edu.focus ? `<p class="text-sm text-gray-500">Focus: ${edu.focus}</p>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+
+                        <!-- Certifications -->
+                        ${certifications.length ? `
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold border-l-4 border-yellow-500 pl-3 mb-3">Certifications</h3>
+                            <div class="grid md:grid-cols-2 gap-3">
+                                ${certifications.map(cert => `
+                                    <div class="pl-3 border-l-2 border-gray-200 dark:border-gray-700">
+                                        <p class="font-semibold">${cert.name}</p>
+                                        <p class="text-sm text-gray-500">${cert.issuer} • ${cert.year}</p>
+                                        ${cert.credential_id ? `<p class="text-xs text-gray-400">ID: ${cert.credential_id}</p>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <!-- Projects -->
+                        ${projects.length ? `
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold border-l-4 border-indigo-500 pl-3 mb-3">Projects</h3>
+                            ${projects.map(proj => `
+                                <div class="mb-3 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
+                                    <div class="flex justify-between items-start flex-wrap">
+                                        <h4 class="font-bold">${proj.name}</h4>
+                                        <span class="text-sm text-gray-500">${proj.year || ''}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300">${proj.description}</p>
+                                    ${proj.tech ? `<div class="flex flex-wrap gap-2 mt-1">${proj.tech.map(t => `<span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-xs">${t}</span>`).join('')}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+
+                        <!-- Skills -->
+                        ${skills && skills.length ? `
+                        <div>
+                            <h3 class="text-xl font-bold border-l-4 border-pink-500 pl-3 mb-3">Technical Skills</h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${skills.map(s => `<span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm">${s}</span>`).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
             `;
