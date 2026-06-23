@@ -445,7 +445,6 @@
             <a href="#" data-section="certifications"><i class="fas fa-certificate"></i><span class="nav-text">Certifications</span></a>
             <a href="#" data-section="projects"><i class="fas fa-code"></i><span class="nav-text">Projects</span></a>
             <a href="#" data-section="github"><i class="fab fa-github"></i><span class="nav-text">GitHub Repos</span></a>
-            <!-- New CV button -->
             <a href="#" data-section="cv"><i class="fas fa-file-alt"></i><span class="nav-text">CV / Resume</span></a>
             <a href="#" data-section="contact"><i class="fas fa-envelope"></i><span class="nav-text">Contact</span></a>
         </nav>
@@ -686,8 +685,7 @@
 
         // ==================== RENDER: ABOUT (with birthday & age) ====================
         function renderAbout() {
-            // Calculate age from birthday (May 1, 1999)
-            const birthDate = new Date(1999, 4, 1); // May is month 4 (0-indexed)
+            const birthDate = new Date(1999, 4, 1);
             const today = new Date();
             let age = today.getFullYear() - birthDate.getFullYear();
             const m = today.getMonth() - birthDate.getMonth();
@@ -719,7 +717,7 @@
             `;
         }
 
-        // ==================== RENDER: CV / RESUME ====================
+        // ==================== RENDER: CV ====================
         function renderCV() {
             const { experiences, education, certifications, projects, skills } = allData;
             const fullName = "Getaye Fiseha Tadesse";
@@ -729,7 +727,6 @@
             const linkedin = "https://www.linkedin.com/in/getaye-fiseha-tadesse/";
             const github = "https://github.com/getaye21";
 
-            // Calculate age again (for CV)
             const birthDate = new Date(1999, 4, 1);
             const today = new Date();
             let age = today.getFullYear() - birthDate.getFullYear();
