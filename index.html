@@ -402,9 +402,42 @@
             color: transparent;
         }
 
-        /* ===== PRINT STYLES FOR CV ===== */
+        /* ===== CV Edit Mode ===== */
+        .cv-edit-mode .editable {
+            outline: 2px dashed #3B82F6;
+            outline-offset: 2px;
+            cursor: text;
+            transition: outline 0.2s;
+        }
+        .cv-edit-mode .editable:hover {
+            outline-color: #2563eb;
+        }
+        .cv-edit-mode .editable:focus {
+            outline: 2px solid #3B82F6;
+        }
+        .cv-section-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            border-left: 4px solid var(--primary);
+            padding-left: 0.75rem;
+            margin-bottom: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        .cv-reference-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .cv-reference-item:last-child {
+            border-bottom: none;
+        }
+
+        /* ===== Print Styles ===== */
         @media print {
-            .sidebar, .hamburger, .gradient-overlay, #bg-canvas, #theme-toggle, .theme-selector, .sidebar-toggle, .section-nav-btn, .footer, .no-print { display: none !important; }
+            .no-print { display: none !important; }
+            .cv-edit-mode .editable { outline: none !important; }
+            .sidebar, .hamburger, .gradient-overlay, #bg-canvas, #theme-toggle, .theme-selector, .sidebar-toggle, .section-nav-btn, .footer { display: none !important; }
             .main-content { margin-left: 0 !important; padding: 0 !important; }
             #content-container { max-width: 100% !important; padding: 2rem !important; }
             .glass-card { background: white !important; border: 1px solid #ddd !important; box-shadow: none !important; }
@@ -415,16 +448,19 @@
     </style>
 </head>
 <body class="light theme-default">
+    <!-- Animated Background -->
     <canvas id="bg-canvas"></canvas>
     <div class="gradient-overlay"></div>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+    <!-- Hamburger -->
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
         <i class="fas fa-bars"></i>
         <span class="menu-label">Menu</span>
     </button>
 
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <button class="sidebar-toggle" id="sidebarToggle" title="Collapse/Expand sidebar">
             <i class="fas fa-chevron-left"></i>
@@ -444,6 +480,7 @@
             <a href="#" data-section="education"><i class="fas fa-graduation-cap"></i><span class="nav-text">Education</span></a>
             <a href="#" data-section="certifications"><i class="fas fa-certificate"></i><span class="nav-text">Certifications</span></a>
             <a href="#" data-section="projects"><i class="fas fa-code"></i><span class="nav-text">Projects</span></a>
+            <a href="#" data-section="skills"><i class="fas fa-tasks"></i><span class="nav-text">Skills</span></a>
             <a href="#" data-section="github"><i class="fab fa-github"></i><span class="nav-text">GitHub Repos</span></a>
             <a href="#" data-section="cv"><i class="fas fa-file-alt"></i><span class="nav-text">CV / Resume</span></a>
             <a href="#" data-section="contact"><i class="fas fa-envelope"></i><span class="nav-text">Contact</span></a>
@@ -466,12 +503,14 @@
         </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="main-content" id="mainContent">
         <div id="content-container">
             <div class="flex justify-center items-center h-64"><div class="spinner"></div></div>
         </div>
     </main>
 
+    <!-- Footer -->
     <footer class="footer" style="margin-left:280px; padding-left:2rem; padding-right:2rem;">
         <div class="container mx-auto">
             <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -512,7 +551,8 @@
             projects: [],
             news: [],
             services: [],
-            clients: []
+            clients: [],
+            skills: []
         };
 
         const container = document.getElementById('content-container');
@@ -596,17 +636,18 @@
             renderSection(section);
         }
 
-        // ==================== FETCH DATA (Original Working Version) ====================
+        // ==================== FETCH DATA (with skills) ====================
         async function fetchAllData() {
             try {
-                const [experiences, certifications, education, projects, news, services, clients] = await Promise.all([
+                const [experiences, certifications, education, projects, news, services, clients, skills] = await Promise.all([
                     supabaseClient.from('experiences').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('certifications').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('education').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('projects').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('news').select('*').order('date', { ascending: false }),
                     supabaseClient.from('services').select('*').order('display_order', { ascending: true }),
-                    supabaseClient.from('clients').select('*').order('display_order', { ascending: true })
+                    supabaseClient.from('clients').select('*').order('display_order', { ascending: true }),
+                    supabaseClient.from('skills').select('*').order('display_order', { ascending: true })
                 ]);
                 allData.experiences = experiences.data || [];
                 allData.certifications = certifications.data || [];
@@ -615,6 +656,7 @@
                 allData.news = news.data || [];
                 allData.services = services.data || [];
                 allData.clients = clients.data || [];
+                allData.skills = skills.data || [];
                 renderSection(currentSection);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -634,6 +676,7 @@
                 case 'education': renderEducation(); break;
                 case 'certifications': renderCertifications(); break;
                 case 'projects': renderProjects(); break;
+                case 'skills': renderSkills(); break;
                 case 'github': renderGitHub(); break;
                 case 'cv': renderCV(); break;
                 case 'contact': renderContact(); break;
@@ -683,15 +726,8 @@
             `;
         }
 
-        // ==================== RENDER: ABOUT (with birthday & age) ====================
+        // ==================== RENDER: ABOUT ====================
         function renderAbout() {
-            const birthDate = new Date(1999, 4, 1);
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
             container.innerHTML = `
                 <div class="max-w-3xl mx-auto space-y-6">
                     <h2 class="text-3xl font-bold">About Me</h2>
@@ -703,148 +739,12 @@
                     <div class="glass-card rounded-xl p-6">
                         <p class="text-lg leading-relaxed">I am a passionate IT professional currently working as a System and Database Officer at Ahadu Bank, where I manage Active Directory, Oracle Database, Nutanix Prism virtualization, and mail exchange systems. With a strong foundation in Electrical and Computer Engineering from Wollo University (GPA: 3.91) and ongoing MSc in Computer Science at Addis Ababa University, I bridge the gap between infrastructure engineering and modern software development.</p>
                         <p class="text-lg leading-relaxed mt-4">My technical expertise includes Linux system administration, virtualization (Nutanix AHV), hyper-converged infrastructure, cloud databases, and full-stack development with React, Node.js, and Python.</p>
-                        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                            <p class="text-sm"><i class="fas fa-birthday-cake text-blue-500 mr-2"></i> <strong>Birthday:</strong> May 1, 1999 &nbsp;|&nbsp; <strong>Age:</strong> ${age} years</p>
-                        </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-server text-3xl text-blue-500"></i><p class="font-semibold mt-2">System Admin</p></div>
                         <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-code text-3xl text-blue-500"></i><p class="font-semibold mt-2">Full Stack Dev</p></div>
                         <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-brain text-3xl text-blue-500"></i><p class="font-semibold mt-2">AI Engineer</p></div>
                         <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-building text-3xl text-blue-500"></i><p class="font-semibold mt-2">Infrastructure Eng</p></div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // ==================== RENDER: CV ====================
-        function renderCV() {
-            const { experiences, education, certifications, projects, skills } = allData;
-            const fullName = "Getaye Fiseha Tadesse";
-            const email = "getayefiseha21@gmail.com";
-            const phone = "+251-980574725";
-            const location = "Addis Ababa, Ethiopia";
-            const linkedin = "https://www.linkedin.com/in/getaye-fiseha-tadesse/";
-            const github = "https://github.com/getaye21";
-
-            const birthDate = new Date(1999, 4, 1);
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-
-            container.innerHTML = `
-                <div class="max-w-4xl mx-auto cv-print-section" id="cv-content">
-                    <div class="flex justify-between items-center mb-6 no-print">
-                        <h2 class="text-3xl font-bold"><i class="fas fa-file-alt text-blue-500"></i> Curriculum Vitae</h2>
-                        <button onclick="window.print()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2">
-                            <i class="fas fa-file-pdf"></i> Download PDF
-                        </button>
-                    </div>
-                    <div class="glass-card rounded-xl p-8">
-                        <!-- Header -->
-                        <div class="text-center border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
-                            <h1 class="text-4xl font-bold gradient-text">${fullName}</h1>
-                            <p class="text-xl text-gray-600 dark:text-gray-300 mt-2">System & Database Officer | Full Stack Developer</p>
-                            <div class="flex flex-wrap justify-center gap-4 text-sm text-gray-500 mt-3">
-                                <span><i class="fas fa-envelope mr-1"></i> ${email}</span>
-                                <span><i class="fas fa-phone mr-1"></i> ${phone}</span>
-                                <span><i class="fas fa-map-marker-alt mr-1"></i> ${location}</span>
-                                <span><i class="fab fa-linkedin mr-1"></i> <a href="${linkedin}" target="_blank" class="text-blue-500 hover:underline">LinkedIn</a></span>
-                                <span><i class="fab fa-github mr-1"></i> <a href="${github}" target="_blank" class="text-blue-500 hover:underline">GitHub</a></span>
-                            </div>
-                            <div class="text-sm text-gray-400 mt-2">
-                                <i class="fas fa-birthday-cake mr-1"></i> Birthday: May 1, 1999 (${age} years)
-                            </div>
-                        </div>
-
-                        <!-- Summary -->
-                        <div class="mb-6">
-                            <h3 class="text-xl font-bold border-l-4 border-blue-500 pl-3 mb-3">Professional Summary</h3>
-                            <p class="text-gray-700 dark:text-gray-300 leading-relaxed">Dedicated System and Database Officer with expertise in Oracle Database, Nutanix virtualization, Active Directory, and enterprise IT infrastructure. Currently serving at Ahadu Bank, managing mission-critical systems while pursuing MSc in Computer Science at AAU. Passionate about bridging infrastructure engineering with modern software development and AI research.</p>
-                        </div>
-
-                        <!-- Experience -->
-                        ${experiences.length ? `
-                        <div class="mb-6">
-                            <h3 class="text-xl font-bold border-l-4 border-purple-500 pl-3 mb-3">Work Experience</h3>
-                            ${experiences.map(exp => `
-                                <div class="mb-4 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
-                                    <div class="flex justify-between items-start flex-wrap">
-                                        <div>
-                                            <h4 class="font-bold text-lg">${exp.title}</h4>
-                                            <p class="text-blue-600 dark:text-blue-400 font-medium">${exp.company}</p>
-                                        </div>
-                                        <span class="text-sm text-gray-500">${exp.period}</span>
-                                    </div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">${exp.description}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                        ` : ''}
-
-                        <!-- Education -->
-                        ${education.length ? `
-                        <div class="mb-6">
-                            <h3 class="text-xl font-bold border-l-4 border-green-500 pl-3 mb-3">Education</h3>
-                            ${education.map(edu => `
-                                <div class="mb-3 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
-                                    <div class="flex justify-between items-start flex-wrap">
-                                        <div>
-                                            <h4 class="font-bold">${edu.degree}</h4>
-                                            <p class="text-gray-600 dark:text-gray-400">${edu.school}</p>
-                                        </div>
-                                        <span class="text-sm text-gray-500">${edu.year}</span>
-                                    </div>
-                                    ${edu.gpa ? `<p class="text-sm text-gray-500">GPA: ${edu.gpa}</p>` : ''}
-                                    ${edu.focus ? `<p class="text-sm text-gray-500">Focus: ${edu.focus}</p>` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                        ` : ''}
-
-                        <!-- Certifications -->
-                        ${certifications.length ? `
-                        <div class="mb-6">
-                            <h3 class="text-xl font-bold border-l-4 border-yellow-500 pl-3 mb-3">Certifications</h3>
-                            <div class="grid md:grid-cols-2 gap-3">
-                                ${certifications.map(cert => `
-                                    <div class="pl-3 border-l-2 border-gray-200 dark:border-gray-700">
-                                        <p class="font-semibold">${cert.name}</p>
-                                        <p class="text-sm text-gray-500">${cert.issuer} • ${cert.year}</p>
-                                        ${cert.credential_id ? `<p class="text-xs text-gray-400">ID: ${cert.credential_id}</p>` : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        ` : ''}
-
-                        <!-- Projects -->
-                        ${projects.length ? `
-                        <div class="mb-6">
-                            <h3 class="text-xl font-bold border-l-4 border-indigo-500 pl-3 mb-3">Projects</h3>
-                            ${projects.map(proj => `
-                                <div class="mb-3 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
-                                    <div class="flex justify-between items-start flex-wrap">
-                                        <h4 class="font-bold">${proj.name}</h4>
-                                        <span class="text-sm text-gray-500">${proj.year || ''}</span>
-                                    </div>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300">${proj.description}</p>
-                                    ${proj.tech ? `<div class="flex flex-wrap gap-2 mt-1">${proj.tech.map(t => `<span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-xs">${t}</span>`).join('')}</div>` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                        ` : ''}
-
-                        <!-- Skills -->
-                        ${skills && skills.length ? `
-                        <div>
-                            <h3 class="text-xl font-bold border-l-4 border-pink-500 pl-3 mb-3">Technical Skills</h3>
-                            <div class="flex flex-wrap gap-2">
-                                ${skills.map(s => `<span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm">${s}</span>`).join('')}
-                            </div>
-                        </div>
-                        ` : ''}
                     </div>
                 </div>
             `;
@@ -1034,6 +934,35 @@
             `;
         }
 
+        // ==================== RENDER: SKILLS ====================
+        function renderSkills() {
+            if (allData.skills.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-gray-500">No skills added yet.</div>`;
+                return;
+            }
+            const grouped = allData.skills.reduce((acc, skill) => {
+                const cat = skill.category || 'General';
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(skill);
+                return acc;
+            }, {});
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold mb-6"><i class="fas fa-tasks text-blue-500"></i> Core Competencies</h2>
+                    ${Object.entries(grouped).map(([category, skills]) => `
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-3">${category}</h3>
+                            <div class="flex flex-wrap gap-3">
+                                ${skills.map(s => `
+                                    <span class="px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition">${s.name}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         // ==================== RENDER: GITHUB ====================
         function renderGitHub() {
             container.innerHTML = `
@@ -1074,6 +1003,170 @@
                 .catch(() => {
                     document.getElementById('github-repos-container').innerHTML = `<div class="col-span-full text-center py-8 text-red-500">⚠️ Failed to load repositories.</div>`;
                 });
+        }
+
+        // ==================== RENDER: CV (with photo, references, edit mode) ====================
+        function renderCV() {
+            const { experiences, education, certifications, projects, skills } = allData;
+            const fullName = "Getaye Fiseha Tadesse";
+            const email = "getayefiseha21@gmail.com";
+            const phone = "+251-980574725";
+            const location = "Addis Ababa, Ethiopia";
+            const linkedin = "https://www.linkedin.com/in/getaye-fiseha-tadesse/";
+            const github = "https://github.com/getaye21";
+            const photo = "https://i.ibb.co/wrPd0w4F/5821188799877727355.jpg";
+
+            // References from the image
+            const references = [
+                { name: "Abel Waleign", title: "Lecturer", contact: "" },
+                { name: "Jemal H.", title: "Lecturer", contact: "" },
+                { name: "Samson K.", title: "Director, Infrastructure & Database, Ahadu Bank S.C.", contact: "+251-911-202558" }
+            ];
+
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto cv-print-section" id="cv-content">
+                    <div class="flex justify-between items-center mb-6 no-print">
+                        <h2 class="text-3xl font-bold"><i class="fas fa-file-alt text-blue-500"></i> Curriculum Vitae</h2>
+                        <div class="flex gap-3">
+                            <button onclick="toggleCVEdit()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition flex items-center gap-2" id="cv-edit-toggle">
+                                <i class="fas fa-edit"></i> Edit CV
+                            </button>
+                            <button onclick="window.print()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2">
+                                <i class="fas fa-file-pdf"></i> Download PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-8" id="cv-card">
+                        <!-- Header with Photo -->
+                        <div class="flex flex-col md:flex-row gap-6 items-center border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
+                            <img src="${photo}" alt="Profile" class="w-32 h-32 rounded-full object-cover border-4 border-blue-500 shadow-lg">
+                            <div class="text-center md:text-left">
+                                <h1 class="text-4xl font-bold gradient-text editable" contenteditable="false">${fullName}</h1>
+                                <p class="text-xl text-gray-600 dark:text-gray-300 editable" contenteditable="false">System & Database Officer | Full Stack Developer</p>
+                                <div class="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-gray-500 mt-2">
+                                    <span><i class="fas fa-envelope mr-1"></i> <span class="editable" contenteditable="false">${email}</span></span>
+                                    <span><i class="fas fa-phone mr-1"></i> <span class="editable" contenteditable="false">${phone}</span></span>
+                                    <span><i class="fas fa-map-marker-alt mr-1"></i> <span class="editable" contenteditable="false">${location}</span></span>
+                                    <span><i class="fab fa-linkedin mr-1"></i> <a href="${linkedin}" target="_blank">LinkedIn</a></span>
+                                    <span><i class="fab fa-github mr-1"></i> <a href="${github}" target="_blank">GitHub</a></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="mb-6">
+                            <h3 class="cv-section-title editable" contenteditable="false">Professional Summary</h3>
+                            <p class="text-gray-700 dark:text-gray-300 leading-relaxed editable" contenteditable="false">Dedicated System and Database Officer with expertise in Oracle Database, Nutanix virtualization, Active Directory, and enterprise IT infrastructure. Currently serving at Ahadu Bank, managing mission-critical systems while pursuing MSc in Computer Science at AAU. Passionate about bridging infrastructure engineering with modern software development and AI research.</p>
+                        </div>
+
+                        <!-- Experience -->
+                        ${experiences.length ? `
+                        <div class="mb-6">
+                            <h3 class="cv-section-title editable" contenteditable="false">Work Experience</h3>
+                            ${experiences.map(exp => `
+                                <div class="mb-4 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
+                                    <div class="flex justify-between items-start flex-wrap">
+                                        <div>
+                                            <h4 class="font-bold text-lg editable" contenteditable="false">${exp.title}</h4>
+                                            <p class="text-blue-600 dark:text-blue-400 font-medium editable" contenteditable="false">${exp.company}</p>
+                                        </div>
+                                        <span class="text-sm text-gray-500 editable" contenteditable="false">${exp.period}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 editable" contenteditable="false">${exp.description}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+
+                        <!-- Education -->
+                        ${education.length ? `
+                        <div class="mb-6">
+                            <h3 class="cv-section-title editable" contenteditable="false">Education</h3>
+                            ${education.map(edu => `
+                                <div class="mb-3 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
+                                    <div class="flex justify-between items-start flex-wrap">
+                                        <div>
+                                            <h4 class="font-bold editable" contenteditable="false">${edu.degree}</h4>
+                                            <p class="text-gray-600 dark:text-gray-400 editable" contenteditable="false">${edu.school}</p>
+                                        </div>
+                                        <span class="text-sm text-gray-500 editable" contenteditable="false">${edu.year}</span>
+                                    </div>
+                                    ${edu.gpa ? `<p class="text-sm text-gray-500 editable" contenteditable="false">GPA: ${edu.gpa}</p>` : ''}
+                                    ${edu.focus ? `<p class="text-sm text-gray-500 editable" contenteditable="false">Focus: ${edu.focus}</p>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+
+                        <!-- Certifications -->
+                        ${certifications.length ? `
+                        <div class="mb-6">
+                            <h3 class="cv-section-title editable" contenteditable="false">Certifications</h3>
+                            <div class="grid md:grid-cols-2 gap-3">
+                                ${certifications.map(cert => `
+                                    <div class="pl-3 border-l-2 border-gray-200 dark:border-gray-700">
+                                        <p class="font-semibold editable" contenteditable="false">${cert.name}</p>
+                                        <p class="text-sm text-gray-500 editable" contenteditable="false">${cert.issuer} • ${cert.year}</p>
+                                        ${cert.credential_id ? `<p class="text-xs text-gray-400 editable" contenteditable="false">ID: ${cert.credential_id}</p>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <!-- Projects -->
+                        ${projects.length ? `
+                        <div class="mb-6">
+                            <h3 class="cv-section-title editable" contenteditable="false">Projects</h3>
+                            ${projects.map(proj => `
+                                <div class="mb-3 pl-3 border-l-2 border-gray-200 dark:border-gray-700">
+                                    <div class="flex justify-between items-start flex-wrap">
+                                        <h4 class="font-bold editable" contenteditable="false">${proj.name}</h4>
+                                        <span class="text-sm text-gray-500 editable" contenteditable="false">${proj.year || ''}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 editable" contenteditable="false">${proj.description}</p>
+                                    ${proj.tech ? `<div class="flex flex-wrap gap-2 mt-1">${proj.tech.map(t => `<span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-xs">${t}</span>`).join('')}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+
+                        <!-- Skills (from Supabase) -->
+                        ${skills && skills.length ? `
+                        <div class="mb-6">
+                            <h3 class="cv-section-title editable" contenteditable="false">Core Competencies</h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${skills.map(s => `<span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm editable" contenteditable="false">${s.name}</span>`).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <!-- References -->
+                        <div>
+                            <h3 class="cv-section-title editable" contenteditable="false">References</h3>
+                            ${references.map(ref => `
+                                <div class="cv-reference-item editable" contenteditable="false">
+                                    <span><strong>${ref.name}</strong> – ${ref.title}</span>
+                                    ${ref.contact ? `<span class="text-sm text-gray-500">${ref.contact}</span>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Bind edit toggle
+            window.toggleCVEdit = function() {
+                const card = document.getElementById('cv-card');
+                const btn = document.getElementById('cv-edit-toggle');
+                const editables = card.querySelectorAll('.editable');
+                const isEditing = card.classList.toggle('cv-edit-mode');
+                editables.forEach(el => {
+                    el.contentEditable = isEditing;
+                });
+                btn.innerHTML = isEditing ? '<i class="fas fa-check"></i> Done Editing' : '<i class="fas fa-edit"></i> Edit CV';
+                btn.classList.toggle('bg-purple-600', !isEditing);
+                btn.classList.toggle('bg-green-600', isEditing);
+            };
         }
 
         // ==================== RENDER: CONTACT ====================
