@@ -1188,6 +1188,43 @@
                         </div>
                     </div>
                     ` : ''}
+
+                    <!-- Languages -->
+                    ${languages && languages.length ? `
+                    <div class="mb-6">
+                        <h3 class="cv-section-title editable" contenteditable="false">Languages</h3>
+                        ${languages.map(lang => `
+                            <div class="mb-1"><strong>${lang.name}</strong> ${lang.proficiency ? `– ${lang.proficiency}` : ''}</div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+
+                    <!-- References -->
+                    ${references && references.length ? `
+                    <div class="mb-6">
+                        <h3 class="cv-section-title editable" contenteditable="false">References</h3>
+                        ${references.map(ref => `
+                            <div class="cv-reference-item editable" contenteditable="false">
+                                <span><strong>${ref.name}</strong> – ${ref.title || ''}${ref.company ? ', ' + ref.company : ''}</span>
+                                ${ref.contact ? `<span class="text-sm text-gray-500">${ref.contact}</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+
+                    <!-- Activities -->
+                    ${activities && activities.length ? `
+                    <div>
+                        <h3 class="cv-section-title editable" contenteditable="false">Activities & Volunteering</h3>
+                        ${activities.map(act => `
+                            <div class="mb-2">
+                                <strong>${act.title}</strong> ${act.organization ? `– ${act.organization}` : ''}
+                                ${act.period ? `<div class="text-sm text-gray-500">${act.period}</div>` : ''}
+                                ${act.description ? `<div class="text-sm text-gray-600 dark:text-gray-400">${act.description}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
                 </div>
             `;
 
