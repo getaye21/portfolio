@@ -22,10 +22,14 @@
             --primary-bg: rgba(59,130,246,0.1);
             --sidebar-bg: rgba(255,255,255,0.95);
             --border-color: rgba(0,0,0,0.06);
+            --bg-body: #f9fafb;
+            --text-body: #111827;
         }
         body.dark {
             --sidebar-bg: rgba(18,18,30,0.95);
             --border-color: rgba(255,255,255,0.06);
+            --bg-body: #030712;
+            --text-body: #f9fafb;
         }
         /* Theme classes (applied to body) */
         .theme-purple { --primary: #8B5CF6; --primary-dark: #7c3aed; --primary-light: #c4b5fd; --primary-bg: rgba(139,92,246,0.1); }
@@ -35,7 +39,7 @@
         .theme-teal { --primary: #14B8A6; --primary-dark: #0d9488; --primary-light: #5eead4; --primary-bg: rgba(20,184,166,0.1); }
 
         * { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
-        body { transition: background-color 0.3s ease, color 0.2s ease; overflow-x: hidden; }
+        body { transition: background-color 0.3s ease, color 0.2s ease; overflow-x: hidden; background-color: var(--bg-body); color: var(--text-body); }
         
         .sidebar {
             position: fixed;
@@ -162,33 +166,7 @@
         }
         .sidebar-footer button i { width: 20px; text-align: center; }
 
-        .theme-selector {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            padding: 0.25rem 0;
-        }
-        .theme-selector .theme-dot {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .theme-selector .theme-dot:hover { transform: scale(1.1); }
-        .theme-selector .theme-dot.active {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary);
-        }
-        .theme-selector label {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            text-align: center;
-            display: block;
-            margin-top: 0.2rem;
-        }
+        /* No colour dots – removed */
 
         .main-content {
             margin-left: 280px;
@@ -487,21 +465,12 @@
             <a href="#" data-section="contact"><i class="fas fa-envelope"></i><span class="nav-text">Contact</span></a>
         </nav>
         <div class="sidebar-footer">
-            <!-- Theme toggle button (cycles through themes) -->
-            <button id="theme-toggle" title="Cycle theme">
-                <i id="theme-icon" class="fas fa-palette"></i>
-                <span class="footer-text">Cycle Theme</span>
+            <!-- Single Theme Toggle Button -->
+            <button id="theme-toggle" title="Toggle theme (light/dark & colour)">
+                <i id="theme-icon" class="fas fa-sun"></i>
+                <span class="footer-text">Toggle Theme</span>
             </button>
-            <div class="theme-selector" id="themeSelector">
-                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-                    <span class="theme-dot active" data-theme="default" style="background:#3B82F6;" title="Default Blue"></span>
-                    <span class="theme-dot" data-theme="purple" style="background:#8B5CF6;" title="Purple"></span>
-                    <span class="theme-dot" data-theme="green" style="background:#22C55E;" title="Green"></span>
-                    <span class="theme-dot" data-theme="orange" style="background:#F59E0B;" title="Orange"></span>
-                    <span class="theme-dot" data-theme="pink" style="background:#EC4899;" title="Pink"></span>
-                    <span class="theme-dot" data-theme="teal" style="background:#14B8A6;" title="Teal"></span>
-                </div>
-            </div>
+            <!-- Removed colour dots and separate dark toggle -->
         </div>
     </aside>
 
@@ -532,6 +501,9 @@
     </style>
 
     <script>
+        // ==================== ADMIN PASSWORD (for CV edit) ====================
+        const ADMIN_PASSWORD = "getaye"; // same as in admin.html
+
         // ==================== SUPABASE CONFIG ====================
         const SUPABASE_URL = "https://vedehlwosfutknqhguiv.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlZGVobHdvc2Z1dGtucWhndWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMjQxOTUsImV4cCI6MjA5NzcwMDE5NX0.PU4cyfwNj41flxXXcLL37YgLHIjKhzkkRg4KWmHZ0H0";
@@ -544,7 +516,6 @@
         emailjs.init(EMAILJS_PUBLIC_KEY);
 
         // ==================== STATE ====================
-        // Set initial section from URL hash or default to 'home'
         let currentSection = window.location.hash.replace('#', '') || 'home';
         let allData = {
             experiences: [],
@@ -603,52 +574,58 @@
         overlay.addEventListener('click', closeSidebar);
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
 
-        // ==================== THEMES ====================
-        // List of all theme names in order
-        const themeList = ['default', 'purple', 'green', 'orange', 'pink', 'teal'];
-        let currentThemeIndex = themeList.indexOf(localStorage.getItem('theme') || 'default');
+        // ==================== THEME SYSTEM (Single Toggle) ====================
+        // Define all theme states: [dark (boolean), colour (string)]
+        const themeStates = [
+            { dark: false, colour: 'default' },
+            { dark: true,  colour: 'default' },
+            { dark: false, colour: 'purple' },
+            { dark: true,  colour: 'purple' },
+            { dark: false, colour: 'green' },
+            { dark: true,  colour: 'green' },
+            { dark: false, colour: 'orange' },
+            { dark: true,  colour: 'orange' },
+            { dark: false, colour: 'pink' },
+            { dark: true,  colour: 'pink' },
+            { dark: false, colour: 'teal' },
+            { dark: true,  colour: 'teal' }
+        ];
 
-        function applyTheme(theme) {
-            // Remove all theme classes
+        // Load current theme index from localStorage, or default to 0 (light default)
+        let currentThemeIndex = parseInt(localStorage.getItem('themeIndex')) || 0;
+        // Ensure index is valid
+        if (currentThemeIndex >= themeStates.length) currentThemeIndex = 0;
+
+        function applyThemeState(index) {
+            const state = themeStates[index];
+            // Dark mode
+            document.body.classList.toggle('dark', state.dark);
+            // Colour theme
             document.body.classList.remove('theme-default', 'theme-purple', 'theme-green', 'theme-orange', 'theme-pink', 'theme-teal');
-            if (theme !== 'default') {
-                document.body.classList.add('theme-' + theme);
+            if (state.colour !== 'default') {
+                document.body.classList.add('theme-' + state.colour);
             }
-            localStorage.setItem('theme', theme);
-            // Update active dot
-            document.querySelectorAll('.theme-dot').forEach(dot => {
-                dot.classList.toggle('active', dot.dataset.theme === theme);
-            });
-            // Update currentThemeIndex
-            currentThemeIndex = themeList.indexOf(theme);
-        }
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'default';
-        applyTheme(savedTheme);
-
-        // Theme dot click
-        document.querySelectorAll('.theme-dot').forEach(dot => {
-            dot.addEventListener('click', () => {
-                applyTheme(dot.dataset.theme);
-            });
-        });
-
-        // Theme toggle button – cycles through all themes
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            const nextIndex = (currentThemeIndex + 1) % themeList.length;
-            const nextTheme = themeList[nextIndex];
-            applyTheme(nextTheme);
-            // Update icon to show palette or a hint (optional)
+            // Icon: sun for light, moon for dark
             const icon = document.getElementById('theme-icon');
             if (icon) {
-                icon.className = 'fas fa-palette'; // keep as palette
+                icon.className = state.dark ? 'fas fa-moon' : 'fas fa-sun';
             }
+            // Save to localStorage
+            localStorage.setItem('themeIndex', index);
+            currentThemeIndex = index;
+        }
+
+        // Apply saved theme on load
+        applyThemeState(currentThemeIndex);
+
+        // Theme toggle button: cycle to next state
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const nextIndex = (currentThemeIndex + 1) % themeStates.length;
+            applyThemeState(nextIndex);
         });
 
         // ==================== NAVIGATION (Hash-based) ====================
         function navigateTo(section) {
-            // Update URL hash without triggering 'hashchange' again
             if (window.location.hash !== `#${section}`) {
                 window.location.hash = section;
             }
@@ -749,8 +726,13 @@
             `;
         }
 
-        // ==================== RENDER: ABOUT ====================
+        // ==================== RENDER: ABOUT (with birthday & age) ====================
         function renderAbout() {
+            const birthDate = new Date(1999, 4, 1);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
             container.innerHTML = `
                 <div class="max-w-3xl mx-auto space-y-6">
                     <h2 class="text-3xl font-bold">About Me</h2>
@@ -762,6 +744,9 @@
                     <div class="glass-card rounded-xl p-6">
                         <p class="text-lg leading-relaxed">I am a passionate IT professional currently working as a System and Database Officer at Ahadu Bank, where I manage Active Directory, Oracle Database, Nutanix Prism virtualization, and mail exchange systems. With a strong foundation in Electrical and Computer Engineering from Wollo University (GPA: 3.91) and ongoing MSc in Computer Science at Addis Ababa University, I bridge the gap between infrastructure engineering and modern software development.</p>
                         <p class="text-lg leading-relaxed mt-4">My technical expertise includes Linux system administration, virtualization (Nutanix AHV), hyper-converged infrastructure, cloud databases, and full-stack development with React, Node.js, and Python.</p>
+                        <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                            <p class="text-sm"><i class="fas fa-birthday-cake text-blue-500 mr-2"></i> <strong>Birthday:</strong> May 1, 1999 &nbsp;|&nbsp; <strong>Age:</strong> ${age} years</p>
+                        </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="text-center p-4 glass-card rounded-xl"><i class="fas fa-server text-3xl text-blue-500"></i><p class="font-semibold mt-2">System Admin</p></div>
@@ -941,17 +926,24 @@
                 <div class="max-w-4xl mx-auto">
                     <h2 class="text-3xl font-bold mb-6">💻 Projects</h2>
                     <div class="grid md:grid-cols-2 gap-6">
-                        ${allData.projects.map(p => `
-                            <div class="glass-card rounded-xl p-6">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="text-xl font-bold">${p.name}</h3>
-                                    <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full">${p.year || ''}</span>
+                        ${allData.projects.map(p => {
+                            // Override title if it matches the old one – but we'll just use the DB title.
+                            let displayTitle = p.name;
+                            if (p.name && p.name.includes('Cyber Threat Detection')) {
+                                displayTitle = "A Lightweight Hybrid Deep Learning Framework for Real-Time Cyber Threat Detection and Intent-Aware Self-Healing Network Security";
+                            }
+                            return `
+                                <div class="glass-card rounded-xl p-6">
+                                    <div class="flex justify-between items-start">
+                                        <h3 class="text-xl font-bold">${displayTitle}</h3>
+                                        <span class="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full">${p.year || ''}</span>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-400 text-sm mt-2">${p.description}</p>
+                                    <div class="flex flex-wrap gap-2 mt-3">${p.tech ? p.tech.map(t => `<span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md text-xs">${t}</span>`).join('') : ''}</div>
+                                    ${p.link ? `<a href="${p.link}" target="_blank" class="text-blue-500 text-sm hover:underline mt-3 inline-block">View Project →</a>` : ''}
                                 </div>
-                                <p class="text-gray-600 dark:text-gray-400 text-sm mt-2">${p.description}</p>
-                                <div class="flex flex-wrap gap-2 mt-3">${p.tech ? p.tech.map(t => `<span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md text-xs">${t}</span>`).join('') : ''}</div>
-                                ${p.link ? `<a href="${p.link}" target="_blank" class="text-blue-500 text-sm hover:underline mt-3 inline-block">View Project →</a>` : ''}
-                            </div>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </div>
                 </div>
             `;
@@ -1030,6 +1022,13 @@
 
         // ==================== RENDER: CV ====================
         function renderCV() {
+            // Calculate age
+            const birthDate = new Date(1999, 4, 1);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+
             const { experiences, education, certifications, projects, skills } = allData;
             const fullName = "Getaye Fiseha Tadesse";
             const email = "getayefiseha21@gmail.com";
@@ -1037,10 +1036,12 @@
             const location = "Addis Ababa, Ethiopia";
             const linkedin = "https://www.linkedin.com/in/getaye-fiseha-tadesse/";
             const github = "https://github.com/getaye21";
+            const portfolio = window.location.origin; // dynamic: your current site URL
             const photo = "https://i.ibb.co/wrPd0w4F/5821188799877727355.jpg";
 
+            // References
             const references = [
-                { name: "Abel Walelign", title: "Principal, System and Database Officer, Ahadu Bank S.C.", contact: "+251-961-283113" },            
+                { name: "Abel Walelign", title: "Principal, System and Database Officer, Ahadu Bank S.C.", contact: "+251-961-283113" },
                 { name: "Jemal H.", title: "Lecturer, Wollo University", contact: "+251-922-910657" },
                 { name: "Samson K.", title: "Director, Infrastructure & Database, Ahadu Bank S.C.", contact: "+251-911-202558" }
             ];
@@ -1069,6 +1070,8 @@
                                     <span><i class="fas fa-envelope mr-1"></i> <span class="editable" contenteditable="false">${email}</span></span>
                                     <span><i class="fas fa-phone mr-1"></i> <span class="editable" contenteditable="false">${phone}</span></span>
                                     <span><i class="fas fa-map-marker-alt mr-1"></i> <span class="editable" contenteditable="false">${location}</span></span>
+                                    <span><i class="fas fa-birthday-cake mr-1"></i> <span class="editable" contenteditable="false">Age: ${age} years</span></span>
+                                    <span><i class="fas fa-link mr-1"></i> <span class="editable" contenteditable="false">Portfolio: ${portfolio}</span></span>
                                     <span><i class="fab fa-linkedin mr-1"></i> <a href="${linkedin}" target="_blank">LinkedIn</a></span>
                                     <span><i class="fab fa-github mr-1"></i> <a href="${github}" target="_blank">GitHub</a></span>
                                 </div>
@@ -1176,7 +1179,13 @@
                     </div>
                 </div>
             `;
+            // Admin-only edit toggle
             window.toggleCVEdit = function() {
+                const password = prompt("Enter admin password to edit CV:");
+                if (password !== ADMIN_PASSWORD) {
+                    alert("Incorrect password.");
+                    return;
+                }
                 const card = document.getElementById('cv-card');
                 const btn = document.getElementById('cv-edit-toggle');
                 const editables = card.querySelectorAll('.editable');
@@ -1253,10 +1262,8 @@
         }
 
         // ==================== INIT ====================
-        // Mark active sidebar link based on initial section
         document.querySelector(`.sidebar-nav a[data-section="${currentSection}"]`)?.classList.add('active');
 
-        // Listen to hash changes (back/forward)
         window.addEventListener('hashchange', () => {
             const section = window.location.hash.replace('#', '') || 'home';
             if (section !== currentSection) {
@@ -1264,7 +1271,6 @@
             }
         });
 
-        // Sidebar link clicks – use navigateTo
         sidebarLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -1273,7 +1279,6 @@
             });
         });
 
-        // Start app
         fetchAllData();
     </script>
 </body>
