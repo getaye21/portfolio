@@ -12,298 +12,59 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* (All styles unchanged – same as before) */
         * { font-family: 'Inter', sans-serif; }
         body { background: #f1f5f9; }
-        .admin-topbar {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-        .admin-topbar .brand {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
+        .admin-topbar { background: white; border-bottom: 1px solid #e2e8f0; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .admin-topbar .brand { font-size: 1.25rem; font-weight: 700; color: #1e293b; }
         .admin-topbar .brand span { color: #3B82F6; }
-        .admin-topbar .user-area {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .admin-topbar .user-area .badge {
-            background: #3B82F6;
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .admin-topbar .user-area .logout-btn {
-            background: #f1f5f9;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .admin-topbar .user-area .logout-btn:hover {
-            background: #fee2e2;
-            color: #ef4444;
-        }
-        .sidebar-admin {
-            width: 240px;
-            background: white;
-            border-right: 1px solid #e2e8f0;
-            min-height: calc(100vh - 72px);
-            padding: 1.5rem 1rem;
-            position: fixed;
-            top: 72px;
-            left: 0;
-            overflow-y: auto;
-        }
-        .sidebar-admin a {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: 10px;
-            color: #64748b;
-            text-decoration: none;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        .sidebar-admin a:hover,
-        .sidebar-admin a.active {
-            background: #eff6ff;
-            color: #3B82F6;
-        }
+        .admin-topbar .user-area { display: flex; align-items: center; gap: 1rem; }
+        .admin-topbar .user-area .badge { background: #3B82F6; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .admin-topbar .user-area .logout-btn { background: #f1f5f9; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 500; color: #64748b; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .admin-topbar .user-area .logout-btn:hover { background: #fee2e2; color: #ef4444; }
+        .sidebar-admin { width: 240px; background: white; border-right: 1px solid #e2e8f0; min-height: calc(100vh - 72px); padding: 1.5rem 1rem; position: fixed; top: 72px; left: 0; overflow-y: auto; }
+        .sidebar-admin a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 10px; color: #64748b; text-decoration: none; transition: all 0.2s; font-size: 0.9rem; font-weight: 500; }
+        .sidebar-admin a:hover, .sidebar-admin a.active { background: #eff6ff; color: #3B82F6; }
         .sidebar-admin a i { width: 20px; text-align: center; }
-        .sidebar-admin .nav-section-title {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #94a3b8;
-            padding: 1rem 1rem 0.5rem;
-            font-weight: 600;
-        }
-        .main-admin {
-            margin-left: 240px;
-            padding: 2rem;
-            margin-top: 0;
-        }
-        .admin-card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            border: 1px solid #e2e8f0;
-        }
-        .admin-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-        }
-        .btn {
-            padding: 0.5rem 1.25rem;
-            border-radius: 10px;
-            font-weight: 500;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .btn-primary {
-            background: #3B82F6;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #2563eb;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
-        }
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-        .btn-success {
-            background: #22c55e;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #16a34a;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #e2e8f0;
-            color: #64748b;
-        }
-        .btn-outline:hover {
-            background: #f1f5f9;
-        }
-        .btn-sm {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.8rem;
-        }
+        .sidebar-admin .nav-section-title { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; padding: 1rem 1rem 0.5rem; font-weight: 600; }
+        .main-admin { margin-left: 240px; padding: 2rem; margin-top: 0; }
+        .admin-card { background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
+        .admin-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .btn { padding: 0.5rem 1.25rem; border-radius: 10px; font-weight: 500; transition: all 0.2s; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: #3B82F6; color: white; }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-outline { background: transparent; border: 2px solid #e2e8f0; color: #64748b; }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.8rem; }
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
-        th {
-            text-align: left;
-            padding: 0.75rem 1rem;
-            background: #f8fafc;
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.9rem;
-            vertical-align: middle;
-        }
+        th { text-align: left; padding: 0.75rem 1rem; background: #f8fafc; font-weight: 600; font-size: 0.8rem; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; vertical-align: middle; }
         tr:hover td { background: #f8fafc; }
         .table-actions { display: flex; gap: 0.5rem; }
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(6px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(6px); z-index: 1000; justify-content: center; align-items: center; }
         .modal.open { display: flex; }
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            animation: modalFade 0.25s ease;
-        }
-        @keyframes modalFade {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .modal-content .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .modal-content .modal-header h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        .modal-content .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #94a3b8;
-            cursor: pointer;
-            transition: color 0.2s;
-            padding: 0.25rem 0.5rem;
-            border-radius: 8px;
-        }
-        .modal-content .modal-close:hover {
-            color: #ef4444;
-            background: #f1f5f9;
-        }
-        .modal-content label {
-            font-weight: 500;
-            display: block;
-            margin-bottom: 0.25rem;
-            font-size: 0.85rem;
-            color: #475569;
-        }
-        .modal-content input,
-        .modal-content textarea,
-        .modal-content select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            font-size: 0.95rem;
-            transition: border 0.2s;
-            background: #f8fafc;
-        }
-        .modal-content input:focus,
-        .modal-content textarea:focus,
-        .modal-content select:focus {
-            outline: none;
-            border-color: #3B82F6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
-            background: white;
-        }
-        .modal-content .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-        .modal-content .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e2e8f0;
-        }
+        .modal-content { background: white; border-radius: 20px; padding: 2rem; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: modalFade 0.25s ease; }
+        @keyframes modalFade { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-content .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; }
+        .modal-content .modal-header h2 { font-size: 1.5rem; font-weight: 700; }
+        .modal-content .modal-close { background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; transition: color 0.2s; padding: 0.25rem 0.5rem; border-radius: 8px; }
+        .modal-content .modal-close:hover { color: #ef4444; background: #f1f5f9; }
+        .modal-content label { font-weight: 500; display: block; margin-bottom: 0.25rem; font-size: 0.85rem; color: #475569; }
+        .modal-content input, .modal-content textarea, .modal-content select { width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 1rem; font-size: 0.95rem; transition: border 0.2s; background: #f8fafc; }
+        .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); background: white; }
+        .modal-content .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .modal-content .form-actions { display: flex; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
         .modal-content .form-actions button { flex: 1; }
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            background: #1e293b;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-            z-index: 2000;
-            animation: toastIn 0.3s ease;
-            display: none;
-        }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 1.5rem; border-radius: 12px; background: #1e293b; color: white; font-weight: 500; box-shadow: 0 8px 30px rgba(0,0,0,0.2); z-index: 2000; animation: toastIn 0.3s ease; display: none; }
         .toast.success { background: #22c55e; }
         .toast.error { background: #ef4444; }
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @media (max-width: 768px) {
-            .sidebar-admin { display: none; }
-            .main-admin { margin-left: 0; padding: 1rem; }
-            .admin-topbar { padding: 0.75rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
-            .admin-topbar .brand { font-size: 1rem; }
-            .modal-content { padding: 1.5rem; }
-            .modal-content .form-row { grid-template-columns: 1fr; }
-        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @media (max-width: 768px) { .sidebar-admin { display: none; } .main-admin { margin-left: 0; padding: 1rem; } .admin-topbar { padding: 0.75rem 1rem; flex-wrap: wrap; gap: 0.5rem; } .admin-topbar .brand { font-size: 1rem; } .modal-content { padding: 1.5rem; } .modal-content .form-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -348,6 +109,9 @@
         <a href="#" data-table="services"><i class="fas fa-concierge-bell"></i> Services</a>
         <a href="#" data-table="clients"><i class="fas fa-handshake"></i> Clients</a>
         <a href="#" data-table="skills"><i class="fas fa-tasks"></i> Skills</a>
+        <a href="#" data-table="languages"><i class="fas fa-language"></i> Languages</a>
+        <a href="#" data-table="references"><i class="fas fa-address-book"></i> References</a>
+        <a href="#" data-table="activities"><i class="fas fa-heart"></i> Activities</a>
         <div style="border-top:1px solid #e2e8f0;margin:1rem 0;"></div>
         <a href="index.html" style="color:#94a3b8;"><i class="fas fa-arrow-left"></i> Back to Site</a>
     </aside>
@@ -456,7 +220,6 @@
                 types: { display_order: 'number' },
                 required: ['name']
             },
-            // === FIXED NEWS CONFIG (no display_order) ===
             news: {
                 fields: ['title', 'content', 'date', 'pinned'],
                 labels: {
@@ -499,6 +262,41 @@
                 },
                 types: { display_order: 'number' },
                 required: ['name']
+            },
+            // NEW TABLES
+            languages: {
+                fields: ['name', 'proficiency', 'display_order'],
+                labels: {
+                    name: 'Language *',
+                    proficiency: 'Proficiency (e.g. Native, Fluent, Intermediate)',
+                    display_order: 'Display Order (number)'
+                },
+                types: { display_order: 'number' },
+                required: ['name']
+            },
+            reference: {
+                fields: ['name', 'title', 'company', 'contact', 'display_order'],
+                labels: {
+                    name: 'Name *',
+                    title: 'Title',
+                    company: 'Company',
+                    contact: 'Contact (phone/email)',
+                    display_order: 'Display Order (number)'
+                },
+                types: { display_order: 'number' },
+                required: ['name']
+            },
+            activities: {
+                fields: ['title', 'organization', 'period', 'description', 'display_order'],
+                labels: {
+                    title: 'Activity/Volunteer Title *',
+                    organization: 'Organization',
+                    period: 'Period (e.g. Apr 2019 – Sep 2023)',
+                    description: 'Description',
+                    display_order: 'Display Order (number)'
+                },
+                types: { display_order: 'number' },
+                required: ['title']
             }
         };
 
@@ -521,7 +319,6 @@
         async function loadData(table) {
             currentTable = table;
             try {
-                // For news, order by date descending (newest first)
                 let query = supabaseClient.from(table).select('*');
                 if (table === 'news') {
                     query = query.order('date', { ascending: false });
