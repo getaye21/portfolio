@@ -453,19 +453,137 @@
             }
         }
 
-        /* ===== Print Styles ===== */
+        /* ===== IMPROVED PRINT STYLES ===== */
         @media print {
-            .no-print { display: none !important; }
-            .cv-edit-mode .editable { outline: none !important; }
-            .sidebar, .hamburger, .gradient-overlay, #bg-canvas, #theme-toggle, .theme-selector, .sidebar-toggle, .section-nav-btn, .footer { display: none !important; }
-            .main-content { margin-left: 0 !important; padding: 0 !important; }
-            #content-container { max-width: 100% !important; padding: 2rem !important; }
-            .glass-card { background: white !important; border: 1px solid #ddd !important; box-shadow: none !important; }
-            body { background: white !important; color: black !important; }
-            .gradient-text { color: #3B82F6 !important; background: none !important; -webkit-text-fill-color: #3B82F6 !important; }
-            .cv-print-section { page-break-inside: avoid; }
-            .cv-sidebar-layout { display: block; }
-            .cv-sidebar-left { background: #f1f5f9 !important; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
+            .no-print,
+            .sidebar,
+            .hamburger,
+            .gradient-overlay,
+            #bg-canvas,
+            #theme-toggle,
+            .theme-selector,
+            .sidebar-toggle,
+            .section-nav-btn,
+            .footer {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+
+            #content-container {
+                max-width: 100% !important;
+                padding: 0.5rem !important;
+            }
+
+            .glass-card,
+            #cv-card {
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0.5rem !important;
+                border-radius: 0 !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 1.2cm 1.5cm;
+            }
+
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 11pt;
+                line-height: 1.4;
+            }
+
+            h1 {
+                font-size: 24pt !important;
+            }
+            h2 {
+                font-size: 18pt !important;
+            }
+            h3, .cv-section-title {
+                font-size: 14pt !important;
+                border-left: 3px solid #3B82F6 !important;
+                padding-left: 0.5rem !important;
+                margin-top: 0.8rem !important;
+                margin-bottom: 0.4rem !important;
+            }
+
+            .cv-section-title {
+                margin-top: 0.6rem !important;
+                margin-bottom: 0.3rem !important;
+            }
+            .cv-item, .cv-reference-item, .mb-2, .mb-3, .mb-4 {
+                margin-bottom: 0.25rem !important;
+            }
+            .p-4, .p-5, .p-6, .p-8 {
+                padding: 0.25rem !important;
+            }
+            .py-2, .py-3, .py-4, .py-5 {
+                padding-top: 0.15rem !important;
+                padding-bottom: 0.15rem !important;
+            }
+            .mt-2, .mt-3, .mt-4 {
+                margin-top: 0.15rem !important;
+            }
+
+            .cv-sidebar-layout {
+                display: grid !important;
+                grid-template-columns: 1fr 2fr !important;
+                gap: 1rem !important;
+            }
+            .cv-sidebar-left {
+                background: #f3f4f6 !important;
+                padding: 0.5rem !important;
+                border-radius: 4px !important;
+            }
+            .cv-sidebar-left .cv-section-title {
+                margin-top: 0.4rem !important;
+                font-size: 12pt !important;
+            }
+            .cv-sidebar-left .cv-item {
+                font-size: 10pt !important;
+                margin-bottom: 0.15rem !important;
+            }
+
+            .profile-img, .cv-sidebar-left img {
+                width: 80px !important;
+                height: 80px !important;
+                border-width: 2px !important;
+            }
+
+            .skill-badge, .cv-sidebar-right .flex-wrap span {
+                display: inline-block !important;
+                padding: 0.1rem 0.5rem !important;
+                font-size: 9pt !important;
+                background: #e5e7eb !important;
+                border-radius: 20px !important;
+                margin: 0.1rem !important;
+            }
+
+            .cv-print-section {
+                page-break-inside: avoid !important;
+            }
+            .cv-section-title {
+                page-break-after: avoid !important;
+            }
+            .glass-card > div {
+                page-break-inside: avoid !important;
+            }
+
+            .gradient-text {
+                color: #3B82F6 !important;
+                background: none !important;
+                -webkit-text-fill-color: #3B82F6 !important;
+            }
+
+            #cv-edit-toggle, .no-print {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -531,7 +649,7 @@
                 System Administrator · Full Stack Developer · AI Engineer · Infrastructure Engineer
             </p>
             <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                Let's Work Together!
+                Let's Work Together! Contact me.
             </p>
         </div>
     </footer>
@@ -687,7 +805,7 @@
                     supabaseClient.from('clients').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('skills').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('languages').select('*').order('display_order', { ascending: true }),
-                    supabaseClient.from('reference').select('*').order('display_order', { ascending: true }),
+                    supabaseClient.from('references').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('activities').select('*').order('display_order', { ascending: true })
                 ]);
                 allData.experiences = experiences.data || [];
