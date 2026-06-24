@@ -456,6 +456,7 @@
                 types: { display_order: 'number' },
                 required: ['name']
             },
+            // === FIXED NEWS CONFIG (no display_order) ===
             news: {
                 fields: ['title', 'content', 'date', 'pinned'],
                 labels: {
@@ -520,10 +521,14 @@
         async function loadData(table) {
             currentTable = table;
             try {
-                const { data, error } = await supabaseClient
-                    .from(table)
-                    .select('*')
-                    .order('display_order', { ascending: true });
+                // For news, order by date descending (newest first)
+                let query = supabaseClient.from(table).select('*');
+                if (table === 'news') {
+                    query = query.order('date', { ascending: false });
+                } else {
+                    query = query.order('display_order', { ascending: true });
+                }
+                const { data, error } = await query;
                 if (error) throw error;
                 currentData = data || [];
                 renderTable(table, currentData);
@@ -652,7 +657,9 @@
                 showToast('Please fill in all required fields.', 'error');
                 return;
             }
-            data.display_order = Number(data.display_order) || 0;
+            if (currentTable !== 'news') {
+                data.display_order = Number(data.display_order) || 0;
+            }
             
             const submitBtn = form.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
