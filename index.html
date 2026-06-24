@@ -687,7 +687,7 @@
                     supabaseClient.from('clients').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('skills').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('languages').select('*').order('display_order', { ascending: true }),
-                    supabaseClient.from('references').select('*').order('display_order', { ascending: true }),
+                    supabaseClient.from('reference').select('*').order('display_order', { ascending: true }),
                     supabaseClient.from('activities').select('*').order('display_order', { ascending: true })
                 ]);
                 allData.experiences = experiences.data || [];
