@@ -27,6 +27,7 @@
             --sidebar-bg: rgba(18,18,30,0.95);
             --border-color: rgba(255,255,255,0.06);
         }
+        /* Theme classes (applied to body) */
         .theme-purple { --primary: #8B5CF6; --primary-dark: #7c3aed; --primary-light: #c4b5fd; --primary-bg: rgba(139,92,246,0.1); }
         .theme-green { --primary: #22C55E; --primary-dark: #16a34a; --primary-light: #86efac; --primary-bg: rgba(34,197,94,0.1); }
         .theme-orange { --primary: #F59E0B; --primary-dark: #d97706; --primary-light: #fcd34d; --primary-bg: rgba(245,158,11,0.1); }
@@ -471,7 +472,7 @@
             <span class="gradient-text">Getaye Fiseha Tadesse</span>
         </div>
         <nav class="sidebar-nav">
-            <a href="#" data-section="home" class="active"><i class="fas fa-home"></i><span class="nav-text">Home</span></a>
+            <a href="#" data-section="home"><i class="fas fa-home"></i><span class="nav-text">Home</span></a>
             <a href="#" data-section="about"><i class="fas fa-user"></i><span class="nav-text">About</span></a>
             <a href="#" data-section="news"><i class="fas fa-newspaper"></i><span class="nav-text">News</span></a>
             <a href="#" data-section="services"><i class="fas fa-concierge-bell"></i><span class="nav-text">Services</span></a>
@@ -486,9 +487,10 @@
             <a href="#" data-section="contact"><i class="fas fa-envelope"></i><span class="nav-text">Contact</span></a>
         </nav>
         <div class="sidebar-footer">
-            <button id="theme-toggle">
-                <i id="theme-icon" class="fas fa-sun text-yellow-500"></i>
-                <span class="footer-text">Toggle Theme</span>
+            <!-- Theme toggle button (cycles through themes) -->
+            <button id="theme-toggle" title="Cycle theme">
+                <i id="theme-icon" class="fas fa-palette"></i>
+                <span class="footer-text">Cycle Theme</span>
             </button>
             <div class="theme-selector" id="themeSelector">
                 <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
@@ -533,7 +535,6 @@
         // ==================== SUPABASE CONFIG ====================
         const SUPABASE_URL = "https://vedehlwosfutknqhguiv.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlZGVobHdvc2Z1dGtucWhndWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMjQxOTUsImV4cCI6MjA5NzcwMDE5NX0.PU4cyfwNj41flxXXcLL37YgLHIjKhzkkRg4KWmHZ0H0";
-
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ==================== EMAILJS ====================
@@ -543,7 +544,8 @@
         emailjs.init(EMAILJS_PUBLIC_KEY);
 
         // ==================== STATE ====================
-        let currentSection = 'home';
+        // Set initial section from URL hash or default to 'home'
+        let currentSection = window.location.hash.replace('#', '') || 'home';
         let allData = {
             experiences: [],
             certifications: [],
@@ -562,7 +564,7 @@
         const overlay = document.getElementById('sidebarOverlay');
         const sidebarToggle = document.getElementById('sidebarToggle');
 
-        // ==================== SIDEBAR ====================
+        // ==================== SIDEBAR COLLAPSE ====================
         let isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
         if (isSidebarCollapsed && window.innerWidth > 768) {
             sidebar.classList.add('collapsed');
@@ -588,6 +590,7 @@
             }
         });
 
+        // ==================== MOBILE SIDEBAR ====================
         function toggleSidebar() {
             sidebar.classList.toggle('open');
             overlay.classList.toggle('active');
@@ -600,43 +603,63 @@
         overlay.addEventListener('click', closeSidebar);
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
 
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const section = link.dataset.section;
-                navigateTo(section);
-                closeSidebar();
-            });
-        });
-
         // ==================== THEMES ====================
+        // List of all theme names in order
+        const themeList = ['default', 'purple', 'green', 'orange', 'pink', 'teal'];
+        let currentThemeIndex = themeList.indexOf(localStorage.getItem('theme') || 'default');
+
         function applyTheme(theme) {
+            // Remove all theme classes
             document.body.classList.remove('theme-default', 'theme-purple', 'theme-green', 'theme-orange', 'theme-pink', 'theme-teal');
             if (theme !== 'default') {
                 document.body.classList.add('theme-' + theme);
             }
             localStorage.setItem('theme', theme);
+            // Update active dot
             document.querySelectorAll('.theme-dot').forEach(dot => {
                 dot.classList.toggle('active', dot.dataset.theme === theme);
             });
+            // Update currentThemeIndex
+            currentThemeIndex = themeList.indexOf(theme);
         }
+
+        // Load saved theme
         const savedTheme = localStorage.getItem('theme') || 'default';
         applyTheme(savedTheme);
+
+        // Theme dot click
         document.querySelectorAll('.theme-dot').forEach(dot => {
             dot.addEventListener('click', () => {
                 applyTheme(dot.dataset.theme);
             });
         });
 
-        // ==================== NAVIGATION ====================
+        // Theme toggle button – cycles through all themes
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const nextIndex = (currentThemeIndex + 1) % themeList.length;
+            const nextTheme = themeList[nextIndex];
+            applyTheme(nextTheme);
+            // Update icon to show palette or a hint (optional)
+            const icon = document.getElementById('theme-icon');
+            if (icon) {
+                icon.className = 'fas fa-palette'; // keep as palette
+            }
+        });
+
+        // ==================== NAVIGATION (Hash-based) ====================
         function navigateTo(section) {
+            // Update URL hash without triggering 'hashchange' again
+            if (window.location.hash !== `#${section}`) {
+                window.location.hash = section;
+            }
             currentSection = section;
             sidebarLinks.forEach(l => l.classList.remove('active'));
             document.querySelector(`.sidebar-nav a[data-section="${section}"]`)?.classList.add('active');
             renderSection(section);
+            closeSidebar();
         }
 
-        // ==================== FETCH DATA (with skills) ====================
+        // ==================== FETCH DATA ====================
         async function fetchAllData() {
             try {
                 const [experiences, certifications, education, projects, news, services, clients, skills] = await Promise.all([
@@ -1005,7 +1028,7 @@
                 });
         }
 
-        // ==================== RENDER: CV (with photo, references, edit mode) ====================
+        // ==================== RENDER: CV ====================
         function renderCV() {
             const { experiences, education, certifications, projects, skills } = allData;
             const fullName = "Getaye Fiseha Tadesse";
@@ -1016,9 +1039,8 @@
             const github = "https://github.com/getaye21";
             const photo = "https://i.ibb.co/wrPd0w4F/5821188799877727355.jpg";
 
-            // References from the image
             const references = [
-                { name: "Abel Waleign", title: "Principal, System and Database Officer, Ahadu Bank S.C.", contact: "+251-961-283113" },
+                { name: "Abel Walelign", title: "Principal, System and Database Officer, Ahadu Bank S.C.", contact: "+251-961-283113" },            
                 { name: "Jemal H.", title: "Lecturer, Wollo University", contact: "+251-922-910657" },
                 { name: "Samson K.", title: "Director, Infrastructure & Database, Ahadu Bank S.C.", contact: "+251-911-202558" }
             ];
@@ -1131,7 +1153,7 @@
                         </div>
                         ` : ''}
 
-                        <!-- Skills (from Supabase) -->
+                        <!-- Skills -->
                         ${skills && skills.length ? `
                         <div class="mb-6">
                             <h3 class="cv-section-title editable" contenteditable="false">Core Competencies</h3>
@@ -1154,7 +1176,6 @@
                     </div>
                 </div>
             `;
-            // Bind edit toggle
             window.toggleCVEdit = function() {
                 const card = document.getElementById('cv-card');
                 const btn = document.getElementById('cv-edit-toggle');
@@ -1231,92 +1252,28 @@
             });
         }
 
-        // ==================== THEME TOGGLE (Light/Dark) ====================
-        function initTheme() {
-            const saved = localStorage.getItem('colorMode') || 'light';
-            document.body.className = saved;
-            const icon = document.getElementById('theme-icon');
-            if (icon) {
-                icon.className = saved === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
-                icon.style.color = saved === 'dark' ? '#9ca3af' : '#eab308';
-            }
-        }
-        document.getElementById('theme-toggle')?.addEventListener('click', () => {
-            const isDark = document.body.classList.contains('dark');
-            document.body.className = isDark ? 'light' : 'dark';
-            localStorage.setItem('colorMode', isDark ? 'light' : 'dark');
-            const icon = document.getElementById('theme-icon');
-            if (icon) {
-                icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-                icon.style.color = isDark ? '#eab308' : '#9ca3af';
+        // ==================== INIT ====================
+        // Mark active sidebar link based on initial section
+        document.querySelector(`.sidebar-nav a[data-section="${currentSection}"]`)?.classList.add('active');
+
+        // Listen to hash changes (back/forward)
+        window.addEventListener('hashchange', () => {
+            const section = window.location.hash.replace('#', '') || 'home';
+            if (section !== currentSection) {
+                navigateTo(section);
             }
         });
 
-        // ==================== INTERACTIVE BACKGROUND ====================
-        const canvas = document.getElementById('bg-canvas');
-        let ctx = canvas.getContext('2d');
-        let particles = [];
-        let animationId = null;
+        // Sidebar link clicks – use navigateTo
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.dataset.section;
+                navigateTo(section);
+            });
+        });
 
-        function initCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = [];
-            const particleCount = Math.min(80, Math.floor(window.innerWidth * 0.05));
-            for (let i = 0; i < particleCount; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    radius: Math.random() * 2 + 1,
-                    vx: (Math.random() - 0.5) * 0.5,
-                    vy: (Math.random() - 0.5) * 0.5,
-                });
-            }
-        }
-
-        function drawBackground() {
-            if (!ctx) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const isDark = document.body.classList.contains('dark');
-            ctx.strokeStyle = isDark ? 'rgba(59,130,246,0.15)' : 'rgba(59,130,246,0.2)';
-            ctx.lineWidth = 0.8;
-            
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    if (Math.sqrt(dx * dx + dy * dy) < 120) {
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-            
-            for (let p of particles) {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = isDark ? 'rgba(59,130,246,0.4)' : 'rgba(59,130,246,0.5)';
-                ctx.fill();
-                p.x += p.vx;
-                p.y += p.vy;
-                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-            }
-            animationId = requestAnimationFrame(drawBackground);
-        }
-
-        function resizeCanvas() {
-            initCanvas();
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        initCanvas();
-        drawBackground();
-
-        // ==================== INIT ====================
-        initTheme();
+        // Start app
         fetchAllData();
     </script>
 </body>
